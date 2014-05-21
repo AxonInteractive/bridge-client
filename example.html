@@ -1,0 +1,65 @@
+<DOCTYPE html>
+<html>
+  <head>
+    <title>AxonBridge Example</title>
+  </head>
+  <body>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="lib/bridge.min.js"></script>
+    <script type="text/javascript">
+
+      // AxonBridge Initialization
+      // This function bootstraps the module with the required constructor arguments.
+      var bridge = null;
+      jQuery( function () {
+      
+          // =====
+          // SETUP
+          // =====
+
+          // Link to your API by supplying appropriate constructor arguments:
+          //                ================ API URL ================= TIMEOUT
+          AxonBridge.build( 'https://peir.axoninteractive.ca/api/1.0/', 10000 );
+
+          // =====
+          // USAGE
+          // =====
+
+          // Send a log in request to fetch a user object from your API:
+          AxonBridge.login( 'name@domain.com', 'password' );
+
+          // Subsequest requests will sent using the logged-in user to authenticate:
+          AxonBridge.request( 'PUT', 'actions', {
+
+              'type': 'view',
+              'target': 'pretest',
+              'time': new Date() // Parses into ISO date string format, thanks to json3.js.
+
+          } ).done( function ( data, textStatus, jqXHR ) {
+
+          // AxonBridge.request() returns a jqXHR instance, which implements the
+          // JavaScript Promise interface, so you can asynchronously handle responses as:
+          // success...
+          console.log( "Status: " + textStatus );
+          console.log( data );
+
+          } ).fail( function ( jqXHR, textStatus, errorThrown ) {
+
+          // failure...
+          console.log( "Status: " + textStatus );
+          console.log( errorThrown );
+
+          } );
+
+          // ... or whatever your favourite way of dealing with the response might be.
+          //.then( successCallback, failureCallback )
+          //.always( successOrFailureCallback );
+
+          // The user can log out the user when they're done, if they like.
+          AxonBridge.logout();
+
+      } );
+
+    </script>
+  </body>
+</html>
