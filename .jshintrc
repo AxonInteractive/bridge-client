@@ -1,8 +1,6 @@
 {
   "globals": {
     "CryptoJS": false,
-    "$": false,
-    "jQuery": false,
     "AxonBridge": true
   }
 }

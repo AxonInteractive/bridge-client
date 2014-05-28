@@ -1,36 +1,13 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Axon Bridge API Interface
-//
-// Authored by:   Jeff Rose of Axon Interactive
-//
-// Last Modified: May 21, 2014
-//
-// Dependencies:  crypto-js sha256 and hmac256 (https://code.google.com/p/crypto-js/)
-//                jQuery 1.11 (http://jquery.com/)
-//                json3 (https://github.com/bestiejs/json3)
-//                
-//
-// Contents:      AxonBridge Namespace
-//                Bridge Constructor
-//                Identity Constructor
-//
-// *** History ***
-//
-// Version    Date                  Notes
-// =========  ====================  =============================================================
-// 0.0.1      May 21, 2014          First release. 
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////
+// Include dependencies
+var jquery = require( 'include/jquery-1.11.0' );
+var jstorage = require( 'include/jstorage' );
+var Bridge = require( 'Bridge' );
 
+var self = {
 
-//
-// AxonBridge Namespace
-//
-var AxonBridge = {
-
-  // [BOOTSTRAP] build()
-  // Calling build() builds a Bridge object connecting to the API at the specified URL.
+  // [PUBLIC] build()
+  // Calling build() builds a Bridge object to communicate with to the API at the 
+  // specified URL.
   build: function ( apiURL, apiTimeout ) {
 
     AxonBridge = new Bridge( apiURL, apiTimeout );
@@ -39,143 +16,32 @@ var AxonBridge = {
 
 };
 
+// [INIT FUNCTION]
+// This jumpstarts the Bridge library state by checking local storage for an existing 
+// Bridge to start up as. If no other Bridge is found, then the AxonBridge object will 
+// wait to be bootstrapped by a call to its build() function.
+( function () {
 
-// [AxonBridge Constructor]
-// The AxonBridge object is the global object through which other applications will 
-// communicate with the bridged API resources. It provides a simple surface API for logging
-// in and logging out users as well as sending requests to the API. Internally, it handles
-// all of the request authentication necessary for the API without exposing the user's
-// account password to outside scrutiny (and even scrutiny from other local applications
-// to a significant extent).
-function Bridge ( apiURL, apiTimeout ) {
+  // Check for an existing bridge in local storage.
+  var storedBridge = jQuery.jStorage.get( 'axon-bridge', null );
+  if ( storedBridge !== null ) {
 
-  // Don't get screwed by "this".
-  var self = this;
+    // Configure this bridge with the stored settings and start up the bridge.
+    self.build( storedBridge.url, storedBridge.timeout );
 
-  // [PUBLIC] apiURL
-  // The URL path to the API to be bridged. This URL must be written so that the final 
-  // character is a forward-slash (e.g. https://peir.axoninteractive.ca/api/1.0/).
-  self.apiURL = apiURL;
+    // Check if an identity is in local storage to use for authentication.
+    var storedIdentity = jQuery.jStorage.get( 'axon-bridge-identity', null );
+    if ( storedIdentity !== null ) {
 
-  // [PUBLIC] apiTimeout
-  // The timeout period for requests (in milliseconds).
-  self.apiTimeout = apiTimeout; 
+      // Perform a login using the stored credentials to get the most recent
+      // user data from the API.
+      // Note: We assume here that the user wishes to continue using local storage.
+      self.login( storedIdentity.email, storedIdentity.password, true );
 
-  // [PRIVATE] identity
-  // The Identity object used to track the user and create requests signed with 
-  // appropriate HMAC hash values.
-  var identity = null;
-
-  // [PUBLIC] user
-  // The User object returned by the the database relating to the current identity.
-  self.user = null;
-
-  // [PRIVATE] clearIdentity()
-  // Sets the current Identity object to null so it gets garbage collected and cannot be used 
-  // to validate requests going forward.
-  var clearIdentity = function () {
-
-    identity = null;
-
-  };
-
-  // [PRIVATE] setIdentity()
-  // Sets the current Identity object to a new instance given a user's email and password.
-  var setIdentity = function ( email, password ) {
-
-    identity = new Identity( email, password );
-
-  };
-
-  // [PRIVATE] hasIdentity()
-  // Returns whether or not an the Identity object is currently assigned.
-  var hasIdentity = function () {
-
-    return ( identity !== null );
-
-  };
-
-  // [PUBLIC] login()
-  // Log in a user with the given email/password pair. This creates a new Identity object
-  // to sign requests for authentication and performs an initial request to the server to
-  // send a login package.
-  self.login = function ( email, password ) {
-
-    // Configure an Identity object with the user's credentials.
-    setIdentity( email, password );
-
-    // Request to the API to send a login package.
-    self.request( 'GET', 'login', {} )
-      .done( function ( data, textStatus, jqXHR ) {
-
-        // TODO Beef this up with more error checking!!!
-        self.user = data.body.content;
-
-      }  )
-      .fail( function ( jqXHR, textStatus, errorThrown ) {
-
-        // TODO Handle the failed request somehow!!!
-        self.user = null;
-
-      } );
-
-  };
-
-  // [PUBLIC] logout()
-  // Set the user object to null and clear the Identity object user to sign requests for
-  // authentication purposes, so that the logged-out user's credentials can't still be
-  // user to authorize requests.
-  self.logout = function () {
-
-    // Delete the Identity object to preserve the user's password security.
-    clearIdentity();
-
-    // Clear the user so Bridge reports that it is logged out.
-    self.user = null;
-
-  };
-
-  // [PUBLIC] isLoggedIn()
-  // Check if there is currently a user object set. If no user object is set, then none
-  // was returned from the login attempt (and the user is still logged out) or the user 
-  // logged out manually.
-  self.isLoggedIn = function () {
-
-    return ( self.user !== null );
-
-  };
-
-  // [PUBLIC] request()
-  // Sends an XHR request using jQuery.ajax() to the given API resource using the given 
-  // HTTP method. The HTTP request body will be set to the JSON.stringify()ed request 
-  // that is generated by the Identity object set to perform HMAC signing.
-  // Returns a jQuery jqZHR object. See http://api.jquery.com/jQuery.ajax/#jqXHR.
-  // If no Identity is set, sendRequest() returns null, indicating no request was sent.
-  self.request = function ( method, resource, payload ) {
-
-    if ( !hasIdentity() ) {
-      return null;
     }
-    return jQuery.ajax( {
-      'type': method,
-      'url': self.apiURL + resource,
-      'data': JSON.stringify( identity.createRequest( payload ) ),
-      'contentType': 'application/json',
-      'headers': {
-        'Accept': 'application/json'
-      },
-      'timeout': self.apiTimeout,
-      'async': true,
-    } );
 
-  };
+  }
 
-  // [PUBLIC] rebuild()
-  // Creates an entirely new Bridge object to replace this one. Use this carefully!
-  self.build = function ( apiURL, apiTimeout ) {
+} )();
 
-    AxonBridge = new Bridge( apiURL, apiTimeout );
-
-  };
-
-}
+module.exports = self;

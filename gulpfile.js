@@ -2,18 +2,22 @@
 var gulp = require( 'gulp' );
 
 // Include plugins
-var concat = require( 'gulp-concat' );
-var rename = require( 'gulp-rename' );
-var uglify = require( 'gulp-uglify' );
+var clean = require( 'gulp-clean' );
+var shell = require( 'gulp-shell' );
 
-// Build out the final file in both dev and minified forms
-gulp.task( 'build', function () {
-  return gulp.src( [ 'src/**/*.js' ] )
-    .pipe( concat( 'bridge.js' ) )
-    .pipe( gulp.dest( 'lib' ) )
-    .pipe( rename( 'bridge.min.js' ) )
-    .pipe( uglify() )
-    .pipe( gulp.dest( 'lib' ) );
+// Build out the library unminified
+gulp.task( 'build', shell.task( [
+  'r.js.cmd -o build.js'
+] ) );
+
+// Build out the library in minified form
+gulp.task( 'min', shell.task( [
+  'r.js.cmd -o build.min.js'
+] ) );
+
+gulp.task( 'clean', function () {
+  return gulp.src( 'lib', { read: false } )
+    .pipe( clean() );
 } );
 
 // Default task

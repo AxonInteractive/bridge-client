@@ -1,130 +1,16 @@
-(function(){
-
-var C = (typeof window === 'undefined') ? require('./Crypto').Crypto : window.Crypto;
-
-// Shortcuts
-var util = C.util,
-    charenc = C.charenc,
-    UTF8 = charenc.UTF8,
-    Binary = charenc.Binary;
-
-// Constants
-var K = [ 0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5,
-          0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5,
-          0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3,
-          0x72BE5D74, 0x80DEB1FE, 0x9BDC06A7, 0xC19BF174,
-          0xE49B69C1, 0xEFBE4786, 0x0FC19DC6, 0x240CA1CC,
-          0x2DE92C6F, 0x4A7484AA, 0x5CB0A9DC, 0x76F988DA,
-          0x983E5152, 0xA831C66D, 0xB00327C8, 0xBF597FC7,
-          0xC6E00BF3, 0xD5A79147, 0x06CA6351, 0x14292967,
-          0x27B70A85, 0x2E1B2138, 0x4D2C6DFC, 0x53380D13,
-          0x650A7354, 0x766A0ABB, 0x81C2C92E, 0x92722C85,
-          0xA2BFE8A1, 0xA81A664B, 0xC24B8B70, 0xC76C51A3,
-          0xD192E819, 0xD6990624, 0xF40E3585, 0x106AA070,
-          0x19A4C116, 0x1E376C08, 0x2748774C, 0x34B0BCB5,
-          0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3,
-          0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208,
-          0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2 ];
-
-// Public API
-var SHA256 = C.SHA256 = function (message, options) {
-	var digestbytes = util.wordsToBytes(SHA256._sha256(message));
-	return options && options.asBytes ? digestbytes :
-	       options && options.asString ? Binary.bytesToString(digestbytes) :
-	       util.bytesToHex(digestbytes);
-};
-
-// The core
-SHA256._sha256 = function (message) {
-
-	// Convert to byte array
-	if (message.constructor == String) message = UTF8.stringToBytes(message);
-	/* else, assume byte array already */
-
-	var m = util.bytesToWords(message),
-	    l = message.length * 8,
-	    H = [ 0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A,
-	          0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19 ],
-	    w = [],
-	    a, b, c, d, e, f, g, h, i, j,
-	    t1, t2;
-
-	// Padding
-	m[l >> 5] |= 0x80 << (24 - l % 32);
-	m[((l + 64 >> 9) << 4) + 15] = l;
-
-	for (var i = 0; i < m.length; i += 16) {
-
-		a = H[0];
-		b = H[1];
-		c = H[2];
-		d = H[3];
-		e = H[4];
-		f = H[5];
-		g = H[6];
-		h = H[7];
-
-		for (var j = 0; j < 64; j++) {
-
-			if (j < 16) w[j] = m[j + i];
-			else {
-
-				var gamma0x = w[j - 15],
-				    gamma1x = w[j - 2],
-				    gamma0  = ((gamma0x << 25) | (gamma0x >>>  7)) ^
-				              ((gamma0x << 14) | (gamma0x >>> 18)) ^
-				               (gamma0x >>> 3),
-				    gamma1  = ((gamma1x <<  15) | (gamma1x >>> 17)) ^
-				              ((gamma1x <<  13) | (gamma1x >>> 19)) ^
-				               (gamma1x >>> 10);
-
-				w[j] = gamma0 + (w[j - 7] >>> 0) +
-				       gamma1 + (w[j - 16] >>> 0);
-
-			}
-
-			var ch  = e & f ^ ~e & g,
-			    maj = a & b ^ a & c ^ b & c,
-			    sigma0 = ((a << 30) | (a >>>  2)) ^
-			             ((a << 19) | (a >>> 13)) ^
-			             ((a << 10) | (a >>> 22)),
-			    sigma1 = ((e << 26) | (e >>>  6)) ^
-			             ((e << 21) | (e >>> 11)) ^
-			             ((e <<  7) | (e >>> 25));
-
-
-			t1 = (h >>> 0) + sigma1 + ch + (K[j]) + (w[j] >>> 0);
-			t2 = sigma0 + maj;
-
-			h = g;
-			g = f;
-			f = e;
-			e = (d + t1) >>> 0;
-			d = c;
-			c = b;
-			b = a;
-			a = (t1 + t2) >>> 0;
-
-		}
-
-		H[0] += a;
-		H[1] += b;
-		H[2] += c;
-		H[3] += d;
-		H[4] += e;
-		H[5] += f;
-		H[6] += g;
-		H[7] += h;
-
-	}
-
-	return H;
-
-};
-
-// Package private blocksize
-SHA256._blocksize = 16;
-
-SHA256._digestsize = 32;
-
-})();
+/*
+CryptoJS v3.1.2
+code.google.com/p/crypto-js
+(c) 2009-2013 by Jeff Mott. All rights reserved.
+code.google.com/p/crypto-js/wiki/License
+*/
+var CryptoJS=CryptoJS||function(h,s){var f={},t=f.lib={},g=function(){},j=t.Base={extend:function(a){g.prototype=this;var c=new g;a&&c.mixIn(a);c.hasOwnProperty("init")||(c.init=function(){c.$super.init.apply(this,arguments)});c.init.prototype=c;c.$super=this;return c},create:function(){var a=this.extend();a.init.apply(a,arguments);return a},init:function(){},mixIn:function(a){for(var c in a)a.hasOwnProperty(c)&&(this[c]=a[c]);a.hasOwnProperty("toString")&&(this.toString=a.toString)},clone:function(){return this.init.prototype.extend(this)}},
+q=t.WordArray=j.extend({init:function(a,c){a=this.words=a||[];this.sigBytes=c!=s?c:4*a.length},toString:function(a){return(a||u).stringify(this)},concat:function(a){var c=this.words,d=a.words,b=this.sigBytes;a=a.sigBytes;this.clamp();if(b%4)for(var e=0;e<a;e++)c[b+e>>>2]|=(d[e>>>2]>>>24-8*(e%4)&255)<<24-8*((b+e)%4);else if(65535<d.length)for(e=0;e<a;e+=4)c[b+e>>>2]=d[e>>>2];else c.push.apply(c,d);this.sigBytes+=a;return this},clamp:function(){var a=this.words,c=this.sigBytes;a[c>>>2]&=4294967295<<
+32-8*(c%4);a.length=h.ceil(c/4)},clone:function(){var a=j.clone.call(this);a.words=this.words.slice(0);return a},random:function(a){for(var c=[],d=0;d<a;d+=4)c.push(4294967296*h.random()|0);return new q.init(c,a)}}),v=f.enc={},u=v.Hex={stringify:function(a){var c=a.words;a=a.sigBytes;for(var d=[],b=0;b<a;b++){var e=c[b>>>2]>>>24-8*(b%4)&255;d.push((e>>>4).toString(16));d.push((e&15).toString(16))}return d.join("")},parse:function(a){for(var c=a.length,d=[],b=0;b<c;b+=2)d[b>>>3]|=parseInt(a.substr(b,
+2),16)<<24-4*(b%8);return new q.init(d,c/2)}},k=v.Latin1={stringify:function(a){var c=a.words;a=a.sigBytes;for(var d=[],b=0;b<a;b++)d.push(String.fromCharCode(c[b>>>2]>>>24-8*(b%4)&255));return d.join("")},parse:function(a){for(var c=a.length,d=[],b=0;b<c;b++)d[b>>>2]|=(a.charCodeAt(b)&255)<<24-8*(b%4);return new q.init(d,c)}},l=v.Utf8={stringify:function(a){try{return decodeURIComponent(escape(k.stringify(a)))}catch(c){throw Error("Malformed UTF-8 data");}},parse:function(a){return k.parse(unescape(encodeURIComponent(a)))}},
+x=t.BufferedBlockAlgorithm=j.extend({reset:function(){this._data=new q.init;this._nDataBytes=0},_append:function(a){"string"==typeof a&&(a=l.parse(a));this._data.concat(a);this._nDataBytes+=a.sigBytes},_process:function(a){var c=this._data,d=c.words,b=c.sigBytes,e=this.blockSize,f=b/(4*e),f=a?h.ceil(f):h.max((f|0)-this._minBufferSize,0);a=f*e;b=h.min(4*a,b);if(a){for(var m=0;m<a;m+=e)this._doProcessBlock(d,m);m=d.splice(0,a);c.sigBytes-=b}return new q.init(m,b)},clone:function(){var a=j.clone.call(this);
+a._data=this._data.clone();return a},_minBufferSize:0});t.Hasher=x.extend({cfg:j.extend(),init:function(a){this.cfg=this.cfg.extend(a);this.reset()},reset:function(){x.reset.call(this);this._doReset()},update:function(a){this._append(a);this._process();return this},finalize:function(a){a&&this._append(a);return this._doFinalize()},blockSize:16,_createHelper:function(a){return function(c,d){return(new a.init(d)).finalize(c)}},_createHmacHelper:function(a){return function(c,d){return(new w.HMAC.init(a,
+d)).finalize(c)}}});var w=f.algo={};return f}(Math);
+(function(h){for(var s=CryptoJS,f=s.lib,t=f.WordArray,g=f.Hasher,f=s.algo,j=[],q=[],v=function(a){return 4294967296*(a-(a|0))|0},u=2,k=0;64>k;){var l;a:{l=u;for(var x=h.sqrt(l),w=2;w<=x;w++)if(!(l%w)){l=!1;break a}l=!0}l&&(8>k&&(j[k]=v(h.pow(u,0.5))),q[k]=v(h.pow(u,1/3)),k++);u++}var a=[],f=f.SHA256=g.extend({_doReset:function(){this._hash=new t.init(j.slice(0))},_doProcessBlock:function(c,d){for(var b=this._hash.words,e=b[0],f=b[1],m=b[2],h=b[3],p=b[4],j=b[5],k=b[6],l=b[7],n=0;64>n;n++){if(16>n)a[n]=
+c[d+n]|0;else{var r=a[n-15],g=a[n-2];a[n]=((r<<25|r>>>7)^(r<<14|r>>>18)^r>>>3)+a[n-7]+((g<<15|g>>>17)^(g<<13|g>>>19)^g>>>10)+a[n-16]}r=l+((p<<26|p>>>6)^(p<<21|p>>>11)^(p<<7|p>>>25))+(p&j^~p&k)+q[n]+a[n];g=((e<<30|e>>>2)^(e<<19|e>>>13)^(e<<10|e>>>22))+(e&f^e&m^f&m);l=k;k=j;j=p;p=h+r|0;h=m;m=f;f=e;e=r+g|0}b[0]=b[0]+e|0;b[1]=b[1]+f|0;b[2]=b[2]+m|0;b[3]=b[3]+h|0;b[4]=b[4]+p|0;b[5]=b[5]+j|0;b[6]=b[6]+k|0;b[7]=b[7]+l|0},_doFinalize:function(){var a=this._data,d=a.words,b=8*this._nDataBytes,e=8*a.sigBytes;
+d[e>>>5]|=128<<24-e%32;d[(e+64>>>9<<4)+14]=h.floor(b/4294967296);d[(e+64>>>9<<4)+15]=b;a.sigBytes=4*d.length;this._process();return this._hash},clone:function(){var a=g.clone.call(this);a._hash=this._hash.clone();return a}});s.SHA256=g._createHelper(f);s.HmacSHA256=g._createHmacHelper(f)})(Math);

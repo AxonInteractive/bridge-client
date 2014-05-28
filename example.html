@@ -4,14 +4,12 @@
     <title>AxonBridge Example</title>
   </head>
   <body>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script type="text/javascript" src="lib/bridge.min.js"></script>
+    <script src="lib/axon-bridge.js"></script>
     <script type="text/javascript">
-
+      
       // AxonBridge Initialization
       // This function bootstraps the module with the required constructor arguments.
-      var bridge = null;
-      jQuery( function () {
+      ( function () {
       
           // =====
           // SETUP
@@ -19,21 +17,39 @@
 
           // Link to your API by supplying appropriate constructor arguments:
           //                ================ API URL ================= TIMEOUT
-          AxonBridge.build( 'https://peir.axoninteractive.ca/api/1.0/', 10000 );
+          AxonBridge.build( 'https://192.168.2.34:3000/api/1.0/', 10000 );
+
+          // Hook up callbacks for events you're interested in:
+          AxonBridge.loginFailureCallback = function ( user, jqXHR, textStatus, errorThrown ) {
+            console.log( "Request failed >> " + textStatus );
+            console.log( errorThrown );
+            console.log( jqXHR );
+          };
+          AxonBridge.loginSuccessCallback = function ( user, data, textStatus, jqXHR ) {
+            console.log( "Request successful >> " + data );
+            console.log( data );
+            console.log( jqXHR );
+          };
+          AxonBridge.logoutCallback = function ( user ) {
+            console.log( "Logging out...");
+          };
+          AxonBridge.requestCallback = function ( user, method, resource, payload ) {
+            console.log( "Request >> " + method + " resource " + resource + " = " + JSON.stringify( payload ) );
+          };
 
           // =====
           // USAGE
           // =====
 
           // Send a log in request to fetch a user object from your API:
-          AxonBridge.login( 'name@domain.com', 'password' );
+          AxonBridge.login( 'first@domain.com', 'gr33np3pp3r' );
 
           // Subsequest requests will sent using the logged-in user to authenticate:
           AxonBridge.request( 'PUT', 'actions', {
 
               'type': 'view',
               'target': 'pretest',
-              'time': new Date() // Parses into ISO date string format, thanks to json3.js.
+              'time': new Date() // Parses into ISO-8061 date string format, thanks to json3.js.
 
           } ).done( function ( data, textStatus, jqXHR ) {
 
@@ -42,25 +58,21 @@
           
           // Success...
           console.log( "Status: " + textStatus );
-          console.log( data );
 
           } ).fail( function ( jqXHR, textStatus, errorThrown ) {
 
           // Failure...
           console.log( "Status: " + textStatus );
-          console.log( errorThrown );
+
+          } ).always( function () {
+
+            // The user can log out when they're done, if they like.
+            AxonBridge.logout();
 
           } );
 
-          // ... or whatever your favourite way of dealing with the response might be.
-          //.then( successCallback, failureCallback )
-          //.always( successOrFailureCallback );
-
-          // The user can log out the user when they're done, if they like.
-          AxonBridge.logout();
-
-      } );
-
+      } )();
+      
     </script>
   </body>
 </html>
