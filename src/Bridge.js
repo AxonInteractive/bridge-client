@@ -102,9 +102,15 @@ module.exports = function ( apiURL, apiTimeout ) {
       self.request( 'GET', 'login', {} )
         .done( function ( data, textStatus, jqXHR ) {
 
+          // Catch the case of a successful response with bogus user data and treat it as a failure.
+          if ( typeof data.content === 'undefined' || typeof data.content.user === 'undefined' ) {
+            self.loginFailureCallback( self.user, jqXHR, textStatus, '' );
+            return;
+          }
+
           // Set the user object with the content of the response body to signify that
           // the user is logged in and we're ready to move on.
-          self.user = data.body.content;
+          self.user = data.content.user;
 
           // Store this identity to local storage, if that was requested.
           // [SECURITY NOTE 1] storeLocally should be set based on user input, by asking whether
@@ -197,13 +203,23 @@ module.exports = function ( apiURL, apiTimeout ) {
         self.requestCallback( self.user, method, resource, payload );
       }
 
+      // If not identity is set, ignore the request
       if ( hasIdentity() === false ) {
         return null;
       }
+
+      // Build the payloadString to be sent along with the message.
+      // Note: If this is a GET request, prepend 'payload=' since the data is sent in the 
+      // query string.
+      var payloadString = ( method.toUpperCase() === 'GET' ) ? 'payload=' : '';
+      payloadString += JSON.stringify( identity.createRequest( payload ) );
+
+      // Send the request
       return jQuery.ajax( {
         'type': method,
         'url': self.url + resource,
-        'data': JSON.stringify( identity.createRequest( payload ) ),
+        'data': payloadString,
+        'dataType': 'json',
         'contentType': 'application/json',
         'headers': {
           'Accept': 'application/json'

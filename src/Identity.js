@@ -18,7 +18,8 @@ module.exports = function ( email, password, dontHashPassword ) {
   // [SECURITY NOTE 4] If dontHashPassword is set to true, this hashing process is skipped. This 
   // feature exists to allow passwords stored in local storage to be used for authentication, since 
   // they have already been hased in this way. DO NOT USE THIS FOR ANYTHING ELSE!
-  var hashedPassword = ( dontHashPassword === true ) ? password : CryptoJS.SHA256( password );
+  var hashedPassword = ( dontHashPassword === true ) ? password : 
+    CryptoJS.SHA256( password ).toString( CryptoJS.enc.Hex );
 
   // [SECURITY NOTE 2] The user's given password should be forgotten once it has been hashed.
   // Although the password is local to this constructor, it is better that it not even be 
@@ -43,10 +44,23 @@ module.exports = function ( email, password, dontHashPassword ) {
   // are identical and authorize the request.
   function hmacSignRequestBody ( reqBody ) {
 
-    reqBody.hmac = CryptoJS.HmacSHA256(
-      JSON.stringify( reqBody.content ) + reqBody.email + JSON.stringify( reqBody.time ),
-      hashedPassword
-    ).toString( CryptoJS.enc.Hex );
+    // Create the concatenated string to be hashed as the HMAC
+    var content = JSON.stringify( reqBody.content );
+    var email = reqBody.email;
+    var time = reqBody.time.toISOString();
+    var concat = content + email + time;
+
+    // Add the 'hmac' property to the request with a value computed by salting the concat with the
+    // user's hashedPassword.
+    // [CAREFUL] hashedPassword should be a string. If it isn't, terrible things WILL happen!
+    reqBody.hmac = CryptoJS.HmacSHA256( concat, hashedPassword ).toString( CryptoJS.enc.Hex );
+
+    //console.log( 'Hashpass: "' + hashedPassword + '"' );
+    //console.log( 'Content: "' + content + '"' );
+    //console.log( 'Email: "' + email + '"' );
+    //console.log( 'Time: "' + time + '"' );
+    //console.log( 'Concat: "' + concat + '"' );
+    //console.log( 'HMAC: "' + reqBody.hmac + '"' );
 
     return reqBody;
 

@@ -22,13 +22,13 @@
           // Hook up callbacks for events you're interested in:
           AxonBridge.loginFailureCallback = function ( user, jqXHR, textStatus, errorThrown ) {
             console.log( "Request failed >> " + textStatus );
-            console.log( errorThrown );
-            console.log( jqXHR );
+            //console.log( errorThrown );
+            //console.log( jqXHR );
           };
           AxonBridge.loginSuccessCallback = function ( user, data, textStatus, jqXHR ) {
             console.log( "Request successful >> " + data );
-            console.log( data );
-            console.log( jqXHR );
+            //console.log( data );
+            //console.log( jqXHR );
           };
           AxonBridge.logoutCallback = function ( user ) {
             console.log( "Logging out...");
