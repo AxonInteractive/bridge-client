@@ -25,12 +25,17 @@
           // SETUP
           // =====
 
-          // Link to your API by supplying appropriate constructor arguments:
-          //                API  ============= API URL ============== TIMEOUT
-          AxonBridge.init( 'https://192.168.2.34:3000/api/1.0/', 10000 );
+          // Attempt to load up a locally stored Bridge configuration:
+          if ( !AxonBridge.initFromStoredBridge() ) {
 
-          // You can listen for each request if necessary
-          AxonBridge.requestCallback = function ( method, resource, payload ) {
+            // Or connect using the appropriate constructor arguments:
+            //                ============ API URL =============  TIMEOUT
+            AxonBridge.init( 'https://192.168.2.34:3000/api/1.0/', 10000 );
+
+          }
+          
+          // You can listen for each request:
+          AxonBridge.onRequestPresend = function ( method, resource, payload ) {
             console.log( "Request >> " + method + " resource " + resource + " = " + JSON.stringify( payload ) );
           };
 
@@ -38,38 +43,13 @@
           // USAGE
           // =====
 
-          // Send a login request to fetch a user object from your API:
-          api.login.get( 'first@domain.com', 'gr33np3pp3r', true );
+          // Attempt to load up a locally stored user identity and login with that:
+          if ( !AxonBridge.loginAsStoredIdentity() ) {
 
+            // Or just call the API manually to log in with the given credentials:
+            api.login.get( 'first@domain.com', 'gr33np3pp3r', true );
 
-          /*
-          // Subsequest requests will sent using the logged-in user to authenticate:
-          AxonBridge.request( 'PUT', 'actions', {
-
-              'type': 'view',
-              'target': 'pretest',
-              'time': new Date() // Parses into ISO-8061 date string format, thanks to json3.js.
-
-          } ).done( function ( data, textStatus, jqXHR ) {
-
-          // AxonBridge.request() returns a jqXHR instance, which implements the
-          // JavaScript Promise interface, so you can asynchronously handle responses as:
-          
-          // Success...
-          console.log( "Status: " + textStatus );
-
-          } ).fail( function ( jqXHR, textStatus, errorThrown ) {
-
-          // Failure...
-          console.log( "Status: " + textStatus );
-
-          } ).always( function () {
-
-            // The user can log out when they're done, if they like.
-            AxonBridge.logout();
-
-          } );
-          */
+          }
 
       } )();
       

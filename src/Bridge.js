@@ -16,10 +16,23 @@ module.exports = function () {
   // The object to be returned from the factory
   var self = {};
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // PRIVATE ////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
   // [PRIVATE] identity
   // The Identity object used to track the user and create requests signed with 
   // appropriate HMAC hash values.
   var identity = null;
+
+
+  ///////////////
+  // FUNCTIONS //
+  ///////////////
 
   // [PRIVATE] clearIdentity()
   // Sets the current Identity object to null so it gets garbage collected and cannot be used 
@@ -37,6 +50,14 @@ module.exports = function () {
     // Set the user and additional data objects to null
     self.user = null;
     self.additionalData = null;
+
+  };
+
+  // [PRIVATE] hasIdentity()
+  // Returns whether or not an the Identity object is currently assigned.
+  var hasIdentity = function () {
+
+    return ( identity !== null );
 
   };
 
@@ -59,67 +80,78 @@ module.exports = function () {
 
   };
 
-  // [PRIVATE] hasIdentity()
-  // Returns whether or not an the Identity object is currently assigned.
-  var hasIdentity = function () {
 
-    return ( identity !== null );
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
+  // PUBLIC /////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-  };
-
-
-  ////////////
-  // PUBLIC //
-  ////////////
-
-  // [PUBLIC] user
-  // The User object returned by the the database relating to the current identity.
-  self.user = null;
+  ////////////////
+  // PROPERTIES //
+  ////////////////
 
   // [PUBLIC] additionalData
   // The a hashmap of optional objects returned by the the database that provide additional
   // information to be used for implementation-specific login needs.
   self.additionalData = null;
 
+  // [PUBLIC] timeout
+  // The timeout period for requests (in milliseconds).
+  self.timeout = 10000;
+
   // [PUBLIC] url
   // The URL path to the API to be bridged. This URL must be written so that the final 
   // character is a forward-slash (e.g. https://peir.axoninteractive.ca/api/1.0/).
   self.url = '';
 
-  // [PUBLIC] timeout
-  // The timeout period for requests (in milliseconds).
-  self.timeout = 10000;
-
   // [PUBLIC] useLocalStorage
   // Whether or not user credentials and Bridge configuration will be persisted to local storage.
   self.useLocalStorage = false;
 
-  // [PUBLIC] loginErrorCallback()
+  // [PUBLIC] user
+  // The User object returned by the the database relating to the current identity.
+  self.user = null;
+
+
+  ////////////
+  // EVENTS //
+  ////////////
+
+  // [PUBLIC] onLoginCalled()
+  // The callback to call when the login() function is called.
+  // Signature: function ( email, useLocalStorage ) {}
+  self.onLoginCalled = null;
+
+  // [PUBLIC] onLoginError()
   // The callback to call when an error HTTP status code is returned by a login() request or when
   // the data received back from the API is malformed.
   // Signature: function ( data, error ) {}
-  self.loginErrorCallback = null;
+  self.onLoginError = null;
 
-  // [PUBLIC] loginErrorCallback()
+  // [PUBLIC] onLoginTimeout()
   // The callback to call when a login() request comes back as having failed (couldn't connect).
   // Signature: function () {}
-  self.loginTimeoutCallback = null;
+  self.onLoginTimeout = null;
 
-  // [PUBLIC] loginErrorCallback()
+  // [PUBLIC] onLoginSuccess()
   // The callback to call when a HTTP status 200 is received back from the server and the data is 
   // valid for a login() request.
   // Signature: function ( data ) {}
-  self.loginSuccessCallback = null;
+  self.onLoginSuccess = null;
 
   // [PUBLIC] loginErrorCallback()
-  // The callback to call when the logout() function is triggered.
+  // The callback to call when the logout() function is called.
   // Signature: function () {}
-  self.logoutCallback = null;
+  self.onLogoutCalled = null;
 
   // [PUBLIC] requestCallback()
   // The callback to call when a request() call occurs, but before it is sent.
   // Signature: function ( method, resource, payload ) {}
-  self.requestCallback = null;
+  self.onRequestPresend = null;
+
+
+  ///////////////
+  // FUNCTIONS //
+  ///////////////
 
   // [PUBLIC] init()
   // Configure theb Bridge with a new URL and timeout.
@@ -180,11 +212,26 @@ module.exports = function () {
 
   };
 
+  // [PUBLIC] isLoggedIn()
+  // Check if there is currently a user object set. If no user object is set, then none
+  // was returned from the login attempt (and the user is still logged out) or the user 
+  // logged out manually.
+  self.isLoggedIn = function () {
+
+    return ( self.user !== null );
+
+  };
+
   // [PUBLIC] login()
   // Log in a user with the given email/password pair. This creates a new Identity object
   // to sign requests for authentication and performs an initial request to the server to
   // send a login package.
   self.login = function ( email, password, useLocalStorage ) {
+
+    // Notify the user that login() has been called.
+    if ( typeof self.onLoginCalled === 'function' ) {
+      self.onLoginCalled( email, useLocalStorage );
+    }
 
     // Set whether or not the Bridge should store user credentials and Bridge configuration
     // to local storage.
@@ -208,8 +255,8 @@ module.exports = function () {
           clearUser();
 
           // Notify the user of the login error.
-          if ( typeof self.loginErrorCallback === 'function' ) {
-            self.loginErrorCallback( data, error );
+          if ( typeof self.onLoginError === 'function' ) {
+            self.onLoginError( data, error );
           }
 
         } 
@@ -247,8 +294,8 @@ module.exports = function () {
           }
 
           // Notify the user of the successful login.
-          if ( typeof self.loginSuccessCallback === 'function' ) {
-            self.loginSuccessCallback( data );
+          if ( typeof self.onLoginSuccess === 'function' ) {
+            self.onLoginSuccess( data );
           }
 
         }
@@ -263,19 +310,19 @@ module.exports = function () {
         clearUser();
 
         // Notify the user of the failure to connect to the server.
-        if ( typeof self.loginTimeoutCallback === 'function' ) {
-          self.loginTimeoutCallback();
+        if ( typeof self.onLoginTimeout === 'function' ) {
+          self.onLoginTimeout();
         }
 
       } );
 
   };
 
-  // [PUBLIC] loginWithStoredIdentity()
+  // [PUBLIC] loginAsStoredIdentity()
   // Checks the browser's local storage for an existing user and performs a login request
   // using the stored credentials if one is found. Returns true if a login request was sent
   // and false if no login request was sent.
-  self.loginWithStoredIdentity = function () {
+  self.loginAsStoredIdentity = function () {
 
     // Check if an identity is in local storage to use for authentication.
     var storedIdentity = jQuery.jStorage.get( 'axon-bridge-identity', null );
@@ -302,8 +349,8 @@ module.exports = function () {
   self.logout = function () {
 
     // Notify the user of the logout action.
-    if ( typeof self.logoutCallback === 'function' ) {
-      self.logoutCallback();
+    if ( typeof self.onLogoutCalled === 'function' ) {
+      self.onLogoutCalled();
     }
 
     // Delete the Identity object to preserve the user's password security.
@@ -318,16 +365,6 @@ module.exports = function () {
 
   };
 
-  // [PUBLIC] isLoggedIn()
-  // Check if there is currently a user object set. If no user object is set, then none
-  // was returned from the login attempt (and the user is still logged out) or the user 
-  // logged out manually.
-  self.isLoggedIn = function () {
-
-    return ( self.user !== null );
-
-  };
-
   // [PUBLIC] request()
   // Sends an XHR request using jQuery.ajax() to the given API resource using the given 
   // HTTP method. The HTTP request body will be set to the JSON.stringify()ed request 
@@ -336,9 +373,9 @@ module.exports = function () {
   // If no Identity is set, sendRequest() returns null, indicating no request was sent.
   self.request = function ( method, resource, payload ) {
 
-    // Handle custom behaviour programmed by the user.
-    if ( typeof self.requestCallback === "function" ) {
-      self.requestCallback( self.user, method, resource, payload );
+    // Notify the user of the request being ready to send.
+    if ( typeof self.onRequestPresend === "function" ) {
+      self.onRequestPresend( method, resource, payload );
     }
 
     // If not identity is set, ignore the request

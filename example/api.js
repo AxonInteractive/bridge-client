@@ -19,7 +19,7 @@ var api = null;
 
     // [METHOD] GET
     // Use the native Bridge login() call to handle this request/response.
-    // Signature: login( email, password, useLocalStorage )
+    // Signature: function ( email, password, useLocalStorage )
     'get': AxonBridge.login,
 
     // [METHOD] POST
