@@ -4,7 +4,17 @@
     <title>AxonBridge Example</title>
   </head>
   <body>
-    <script src="lib/bridge-client.js"></script>
+
+    <!-- Manually include jQuery, since it's huge and CDN-able -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    
+    <!-- Include the main Axon Bridge client library -->
+    <script type="text/javascript" src="../lib/bridge-client.js"></script>
+    
+    <!-- Include your own API definition library -->
+    <script type="text/javascript" src="api.js"></script>
+    
+    <!-- Do something with your API! -->
     <script type="text/javascript">
       
       // AxonBridge Initialization
@@ -16,24 +26,11 @@
           // =====
 
           // Link to your API by supplying appropriate constructor arguments:
-          //                ================ API URL ================= TIMEOUT
-          AxonBridge.build( 'https://192.168.2.34:3000/api/1.0/', 10000 );
+          //                API  ============= API URL ============== TIMEOUT
+          AxonBridge.init( 'https://192.168.2.34:3000/api/1.0/', 10000 );
 
-          // Hook up callbacks for events you're interested in:
-          AxonBridge.loginFailureCallback = function ( user, jqXHR, textStatus, errorThrown ) {
-            console.log( "Request failed >> " + textStatus );
-            //console.log( errorThrown );
-            //console.log( jqXHR );
-          };
-          AxonBridge.loginSuccessCallback = function ( user, data, textStatus, jqXHR ) {
-            console.log( "Request successful >> " + data );
-            //console.log( data );
-            //console.log( jqXHR );
-          };
-          AxonBridge.logoutCallback = function ( user ) {
-            console.log( "Logging out...");
-          };
-          AxonBridge.requestCallback = function ( user, method, resource, payload ) {
+          // You can listen for each request if necessary
+          AxonBridge.requestCallback = function ( method, resource, payload ) {
             console.log( "Request >> " + method + " resource " + resource + " = " + JSON.stringify( payload ) );
           };
 
@@ -41,9 +38,11 @@
           // USAGE
           // =====
 
-          // Send a log in request to fetch a user object from your API:
-          AxonBridge.login( 'first@domain.com', 'gr33np3pp3r' );
+          // Send a login request to fetch a user object from your API:
+          api.login.get( 'first@domain.com', 'gr33np3pp3r', true );
 
+
+          /*
           // Subsequest requests will sent using the logged-in user to authenticate:
           AxonBridge.request( 'PUT', 'actions', {
 
@@ -70,6 +69,7 @@
             AxonBridge.logout();
 
           } );
+          */
 
       } )();
       

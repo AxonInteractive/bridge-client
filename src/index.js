@@ -4,7 +4,7 @@
 //
 // Authored by:   Jeff Rose of Axon Interactive
 //
-// Last Modified: May 26, 2014
+// Last Modified: June 2, 2014
 //
 // Dependencies:  crypto-js sha256 and hmac-sha256 (https://code.google.com/p/crypto-js/)
 //                jQuery 1.11.0 (http://jquery.com/)
@@ -15,11 +15,9 @@
 //
 // Version    Date                  Notes
 // =========  ====================  =============================================================
-// 0.0.1      May 26, 2014          First release. 
+// 0.0.1      June 2, 2014          First release. 
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Require the root AxonBridge module
 var AxonBridge = require( 'AxonBridge' );
-
-
