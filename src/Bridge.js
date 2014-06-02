@@ -172,13 +172,22 @@ module.exports = function () {
     var storedBridge = jQuery.jStorage.get( 'axon-bridge', null );
     if ( storedBridge !== null ) {
 
+      var parsedBridge = JSON.parse( storedBridge );
+      
+      //console.log( parsedBridge );
+      //console.log( parsedBridge.url );
+      //console.log( parsedBridge.timeout );
+
       // Configure this bridge with the stored settings and start up the bridge.
       // Note: We assume here that the user wishes to continue using local storage.
-      self.init( storedBridge.url, storedBridge.timeout, true );
+      self.init( parsedBridge.url, parsedBridge.timeout, true );
+      
+      // Return true, having initialized with the stored Bridge config
       return true;
 
     }
 
+    // Return false, having not initialized yet
     return false;
 
   };
@@ -226,7 +235,7 @@ module.exports = function () {
   // Log in a user with the given email/password pair. This creates a new Identity object
   // to sign requests for authentication and performs an initial request to the server to
   // send a login package.
-  self.login = function ( email, password, useLocalStorage ) {
+  self.login = function ( email, password, useLocalStorage, dontHashPassword ) {
 
     // Notify the user that login() has been called.
     if ( typeof self.onLoginCalled === 'function' ) {
@@ -238,7 +247,7 @@ module.exports = function () {
     self.useLocalStorage = useLocalStorage;
 
     // Configure an Identity object with the user's credentials.
-    setIdentity( email, password, false );
+    setIdentity( email, password, dontHashPassword );
 
     // Request a login package from the server
     AxonBridge.request( 'GET', 'login', {} )
@@ -287,7 +296,7 @@ module.exports = function () {
             // Store the user
             jQuery.jStorage.set( 'axon-bridge-identity', JSON.stringify( {
               email: email,
-              password: CryptoJS.SHA256( password )
+              password: CryptoJS.SHA256( password ).toString( CryptoJS.enc.Hex )
             } ) );
             jQuery.jStorage.setTTL( 'axon-bridge-identity', 86400000 ); // Expire in 1 day.
 
@@ -328,16 +337,21 @@ module.exports = function () {
     var storedIdentity = jQuery.jStorage.get( 'axon-bridge-identity', null );
     if ( storedIdentity !== null ) {
 
-      // Set the Bridge to use local storage.
-      self.useLocalStorage = true;
+      var parsedIdentity = JSON.parse( storedIdentity );
 
-      // Configure an Identity object with the user's credentials.
-      setIdentity( storedPassword.email, storedPassword.password, true );
+      //console.log( parsedIdentity );
+      //console.log( parsedIdentity.email );
+      //console.log( parsedIdentity.password );
 
+      // Send a login request
+      self.login( parsedIdentity.email, parsedIdentity.password, true, true );
+
+      // Return true, having sent the login request
       return true;
 
     }
 
+    // No login request was sent
     return false;
 
   };

@@ -2,16 +2,12 @@
 // The DefaultApi object supplies Bridge with the necessary login functionality in the absence
 // of a fully fleshed-out user-developed API. This module should also serve as a best-practices
 // example of how to develop an API for the Bridge client.
-var api = null;
-( api = ( function () {
-
-  // The object to be returned from the factory
-  var self = {};
+var api = {
 
   // [RESOURCE] login
   // This resource is required by AxonBridge to provide a way to fetch user data from the
   // database in response to correct authentication credentials being provided.
-  self.login = {
+  login: {
 
     // [METHOD] DELETE
     // Not implemented.
@@ -30,10 +26,10 @@ var api = null;
     // Not implemented.
     'put': null
 
-  };
+  },
 
   /*
-  self.users = {
+  users: {
 
     'delete': null,
 
@@ -83,7 +79,7 @@ var api = null;
 
       } );
 
-    }
+    },
 
     'post': null,
 
@@ -138,6 +134,4 @@ var api = null;
   };
   */
 
-  return self;
-
-} )() );
+};
