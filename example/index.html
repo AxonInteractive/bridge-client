@@ -25,15 +25,65 @@
           // SETUP
           // =====
 
-          // Attempt to load up a locally stored Bridge configuration:
-          if ( !AxonBridge.initFromStoredBridge() ) {
-
-            // Or connect using the appropriate constructor arguments:
-            //                ============ API URL =============  TIMEOUT
-            AxonBridge.init( 'https://192.168.2.34:3000/api/1.0/', 10000 );
-
-          }
+          // Initialize your Bridge with the base URL of your API and a timeout (in milliseconds).
+          //                ============ API URL =============  TIMEOUT
+          AxonBridge.init( 'https://192.168.2.34:3000/api/1.0/', 10000 );
           
+          // You can listen for the login function being called:
+          AxonBridge.onLoginCalled = function () {
+
+            console.log( 'login() called.' );
+            console.log( 'Waiting for a response from the server...' );
+
+          };
+
+          // You can listen for login error codes or malformed data:
+          AxonBridge.onLoginError = function ( error ) {
+
+            console.log( 'login() error!' );
+            console.log( error );
+
+          };
+
+          // You can listen for login timeouts:
+          AxonBridge.onLoginTimeout = function () {
+
+            console.log( 'login() timed out!' );
+            console.log( 'Check your internet connection...' );
+
+          };
+
+          // You can listen for login success:
+          AxonBridge.onLoginSuccess = function ( data ) {
+            
+            console.log( 'login() successful!' );
+            console.log( AxonBridge.user );
+            console.log( AxonBridge.additionalData );
+            console.log( "Is logged in: " + AxonBridge.isLoggedIn() );
+
+            // Confirm that the user identity has been added to local storage
+            console.log( 'User identity:' );
+            console.log( jQuery.jStorage.get( 'axon-bridge-identity', 'Identity not found!' ) );
+            
+            // Call logout() to remove this user
+            AxonBridge.logout();
+
+          };
+
+          // You can listen for the logout() function being called:
+          AxonBridge.onLogoutCalled = function ( data ) {
+
+            console.log( 'logout() called.' );
+            console.log( AxonBridge.user );
+            console.log( AxonBridge.additionalData );
+            console.log( "Is logged in: " + AxonBridge.isLoggedIn() );
+
+            // Confirm that the user identity has been removed from local storage
+            console.log( 'User identity:' );
+            console.log( jQuery.jStorage.get( 'axon-bridge-identity', 'Identity not found!' ) );
+
+          };
+
           // You can listen for each request:
           AxonBridge.onRequestPresend = function ( method, resource, payload ) {
             console.log( "Request >> " + method + " resource " + resource + " = " + JSON.stringify( payload ) );
