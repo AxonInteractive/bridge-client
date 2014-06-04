@@ -13,7 +13,7 @@
     } else {
 
       // change "myLib" to whatever your library is called
-      root.AxonBridge = factory();
+      root.Bridge = factory();
 
     }
 

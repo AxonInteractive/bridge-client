@@ -80,7 +80,7 @@ module.exports = function () {
     setIdentity( email, password, dontHashPassword );
 
     // Request a login package from the server
-    AxonBridge.request( 'GET', 'login', {} )
+    Bridge.request( 'GET', 'login', {} )
       .done( function ( data, textStatus, jqXHR ) {
 
         // Set the user object using the user data that was returned, as long as the data
@@ -134,7 +134,7 @@ module.exports = function () {
       .fail( function ( jqXHR, textStatus, errorThrown ) {
 
         // Reject the obvious error codes
-        var error = AxonBridge.isErrorCodeResponse( jqXHR );
+        var error = Bridge.isErrorCodeResponse( jqXHR );
         if ( error !== null ) {
 
           // Report the error code and message

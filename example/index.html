@@ -1,9 +1,21 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
-    <title>AxonBridge Example</title>
+    <title>Bridge Client Example</title>
   </head>
   <body>
+    <h1>Bridge Client Example</h1>
+    <label for="email">Email: </label>
+    <input id="email" type="text" />
+    <label for="password">Password: </label>
+    <input id="password" type="password" />
+    <label for="useLocalStorage">Use Local Storage: </label>
+    <input id="useLocalStorage" type="checkbox" />
+    <button id="login" type="button">Login</button>
+    <button id="logout" type="button">Logout</button>
+    <div id="notify">
+      <p>Page loaded.</p>
+    </div>
 
     <!-- Manually include jQuery, since it's huge and CDN-able -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
@@ -17,7 +29,7 @@
     <!-- Do something with your API! -->
     <script type="text/javascript">
       
-      // AxonBridge Initialization
+      // Bridge Initialization
       // This function bootstraps the module with the required constructor arguments.
       ( function () {
       
@@ -25,80 +37,89 @@
           // SETUP
           // =====
 
-          // Initialize your Bridge with the base URL of your API and a timeout (in milliseconds).
-          //                ============ API URL =============  TIMEOUT
-          AxonBridge.init( 'https://192.168.2.34:3000/api/1.0/', 10000 );
+          // Initialize your Bridge with the base URL of your API and a timeout (in milliseconds):
+          Bridge.init( 'https://192.168.2.34/node/api/1.0/', 10000 );
+
+          // Attempt to load up a locally stored user identity and login with that:
+          if ( Bridge.loginAsStoredIdentity() ) {
+            $( '#notify' ).prepend( timestamp( '<strong>loginAsStoredIdentity() successful! Logging in...</strong>' ) );
+          } else {
+            $( '#notify' ).prepend( timestamp( '<strong>loginAsStoredIdentity() failed! Waiting for manual login...</strong>' ) );
+          }
+
+          // Hook up the the login process to a button:
+          $( '#login' ).click( function ( evt ) {
+
+            // Read in the input fields
+            var email = $( '#email' ).val();
+            var password = $( '#password' ).val();
+            var useLocalStorage = $( '#useLocalStorage' ).prop( 'checked' );
+
+            // Send a login request using the API definition. See api.js for more.
+            api.login.get( email, password, useLocalStorage );
+
+          } );
+
+          // Hook up the logout process to a button:
+          $( '#logout' ).click( function ( evt ) {
+            
+            // Call Bridge.logout() to clear the user from Bridge.
+            Bridge.logout();
+
+          } );
+
+
+          // ===============
+          // EVENT CALLBACKS
+          // ===============
           
           // You can listen for the login function being called:
-          AxonBridge.onLoginCalled = function () {
-
-            console.log( 'login() called.' );
-            console.log( 'Waiting for a response from the server...' );
-
+          Bridge.onLoginCalled = function () {
+            $( '#notify' ).prepend( timestamp( '<strong>login() called!</strong>' ) );
+            $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
           };
 
           // You can listen for login error codes or malformed data:
-          AxonBridge.onLoginError = function ( error ) {
-
-            console.log( 'login() error!' );
-            console.log( error );
-
+          Bridge.onLoginError = function ( error ) {
+            $( '#notify' ).prepend( timestamp( '<strong>login() error!</strong>  ' + JSON.stringify( error ) ) );
+            $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
           };
 
           // You can listen for login timeouts:
-          AxonBridge.onLoginTimeout = function () {
-
-            console.log( 'login() timed out!' );
-            console.log( 'Check your internet connection...' );
-
+          Bridge.onLoginTimeout = function () {
+            $( '#notify' ).prepend( timestamp( '<strong>login() timed out!</strong>' ) );
+            $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
           };
 
           // You can listen for login success:
-          AxonBridge.onLoginSuccess = function ( data ) {
-            
-            console.log( 'login() successful!' );
-            console.log( AxonBridge.user );
-            console.log( AxonBridge.additionalData );
-            console.log( "Is logged in: " + AxonBridge.isLoggedIn() );
-
-            // Confirm that the user identity has been added to local storage
-            console.log( 'User identity:' );
-            console.log( jQuery.jStorage.get( 'axon-bridge-identity', 'Identity not found!' ) );
-            
-            // Call logout() to remove this user
-            AxonBridge.logout();
-
+          Bridge.onLoginSuccess = function ( data ) {
+            $( '#notify' ).prepend( timestamp( '<strong>login() successful!</strong>' ) );
+            $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
+            $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
+            $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
+            $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + JSON.stringify( jQuery.jStorage.get( 'axon-bridge-identity', 'Not found!' ) ) ) );
           };
 
           // You can listen for the logout() function being called:
-          AxonBridge.onLogoutCalled = function ( data ) {
-
-            console.log( 'logout() called.' );
-            console.log( AxonBridge.user );
-            console.log( AxonBridge.additionalData );
-            console.log( "Is logged in: " + AxonBridge.isLoggedIn() );
-
-            // Confirm that the user identity has been removed from local storage
-            console.log( 'User identity:' );
-            console.log( jQuery.jStorage.get( 'axon-bridge-identity', 'Identity not found!' ) );
-
+          Bridge.onLogoutCalled = function ( data ) {
+            $( '#notify' ).prepend( timestamp( '<strong>logout() called!</strong>' ) );
+            $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
+            $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
+            $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
+            $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + JSON.stringify( jQuery.jStorage.get( 'axon-bridge-identity', 'Not found!' ) ) ) );
           };
 
           // You can listen for each request:
-          AxonBridge.onRequestPresend = function ( method, resource, payload ) {
-            console.log( "Request >> " + method + " resource " + resource + " = " + JSON.stringify( payload ) );
+          Bridge.onRequestPresend = function ( method, resource, payload ) {
+            jQuery( '#notify' ).prepend( timestamp( 'Request >> ' + method + ' resource ' + resource + ' = ' + JSON.stringify( payload ) ) );
           };
 
-          // =====
-          // USAGE
-          // =====
 
-          // Attempt to load up a locally stored user identity and login with that:
-          if ( !AxonBridge.loginAsStoredIdentity() ) {
-
-            // Or just call the API manually to log in with the given credentials:
-            api.login.get( 'first@domain.com', 'gr33np3pp3r', true );
-
+          // =============
+          // JUST A HELPER
+          // =============
+          function timestamp ( message ) {
+            return '<p>' + new Date().toLocaleTimeString() + ': ' + message + '</p>';
           }
 
       } )();

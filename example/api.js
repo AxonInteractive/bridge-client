@@ -5,7 +5,7 @@
 var api = {
 
   // [RESOURCE] login
-  // This resource is required by AxonBridge to provide a way to fetch user data from the
+  // This resource is required by Bridge to provide a way to fetch user data from the
   // database in response to correct authentication credentials being provided.
   login: {
 
@@ -16,7 +16,7 @@ var api = {
     // [METHOD] GET
     // Use the native Bridge login() call to handle this request/response.
     // Signature: function ( email, password, useLocalStorage )
-    'get': AxonBridge.login,
+    'get': Bridge.login,
 
     // [METHOD] POST
     // Not implemented.
@@ -36,14 +36,14 @@ var api = {
     'get': function ( filters ) {
 
       // Request a login package from the server
-      AxonBridge.request( 'GET', 'users/' + filters, {} )
+      Bridge.request( 'GET', 'users/' + filters, {} )
       .done( function ( data, textStatus, jqXHR ) {
 
         // isErrorCodeResponse() provides an easy way to check a broad range of status codes 
         // that you probably want to reject. You don't have to reject the response if it returns
         // an error, of course, but this function call will allow you to sift through most errors
         // with a 1-liner and handle them however you like.
-        var error = AxonBridge.isErrorCodeResponse( jqXHR );
+        var error = Bridge.isErrorCodeResponse( jqXHR );
         if ( error !== null || typeof data !== 'object' || typeof data.content !== 'object' ) {
 
           // NOTE
@@ -86,14 +86,14 @@ var api = {
     'put': function ( payload ) {
 
       // Request a login package from the server
-      AxonBridge.request( 'PUT', 'users', payload )
+      Bridge.request( 'PUT', 'users', payload )
       .done( function ( data, textStatus, jqXHR ) {
 
         // isErrorCodeResponse() provides an easy way to check a broad range of status codes 
         // that you probably want to reject. You don't have to reject the response if it returns
         // an error, of course, but this function call will allow you to sift through most errors
         // with a 1-liner and handle them however you like.
-        var error = AxonBridge.isErrorCodeResponse( jqXHR );
+        var error = Bridge.isErrorCodeResponse( jqXHR );
         if ( error !== null || typeof data !== 'object' || typeof data.content !== 'object' ) {
 
           // NOTE
