@@ -148,7 +148,8 @@ module.exports = function () {
             self.onLoginError( error );
           }
 
-        } else // Connection timeout
+        } 
+        else // Connection timeout
         {
 
           // Report the communication failure

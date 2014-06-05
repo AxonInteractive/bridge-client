@@ -28,101 +28,94 @@
     
     <!-- Do something with your API! -->
     <script type="text/javascript">
+
+      // Initialize your Bridge with the base URL of your API and a timeout (in milliseconds):
+      Bridge.init( 'https://192.168.2.34/node/api/1.0/', 10000 );
+
+      // Attempt to load up a locally stored user identity and login with that:
+      if ( Bridge.loginAsStoredIdentity() ) {
+        $( '#notify' ).prepend( timestamp( '<strong>HTML5 stored user found. Logging in...</strong>' ) );
+      } else {
+        $( '#notify' ).prepend( timestamp( '<strong>No HTML5 stored user. Waiting for manual login...</strong>' ) );
+      }
+
+      // Hook up the the login process to a button:
+      $( '#login' ).click( function ( evt ) {
+
+        // Read in the input fields
+        var email = $( '#email' ).val();
+        var password = $( '#password' ).val();
+        var useLocalStorage = $( '#useLocalStorage' ).prop( 'checked' );
+
+        // Send a login request using the API definition. See api.js for more.
+        api.login.get( email, password, useLocalStorage );
+
+      } );
+
+      // Hook up the logout process to a button:
+      $( '#logout' ).click( function ( evt ) {
+        
+        // Call Bridge.logout() to clear the user from Bridge.
+        Bridge.logout();
+
+      } );
+
+
+      // ===============
+      // EVENT CALLBACKS
+      // ===============
       
-      // Bridge Initialization
-      // This function bootstraps the module with the required constructor arguments.
-      ( function () {
-      
-          // =====
-          // SETUP
-          // =====
+      // You can listen for the login function being called:
+      Bridge.onLoginCalled = function () {
+        $( '#notify' ).prepend( timestamp( '<strong>login() called!</strong>' ) );
+        $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
+      };
 
-          // Initialize your Bridge with the base URL of your API and a timeout (in milliseconds):
-          Bridge.init( 'https://192.168.2.34/node/api/1.0/', 10000 );
+      // You can listen for login error codes or malformed data:
+      Bridge.onLoginError = function ( error ) {
+        $( '#notify' ).prepend( timestamp( '<strong>login() error!</strong>  ' + JSON.stringify( error ) ) );
+        $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
+      };
 
-          // Attempt to load up a locally stored user identity and login with that:
-          if ( Bridge.loginAsStoredIdentity() ) {
-            $( '#notify' ).prepend( timestamp( '<strong>loginAsStoredIdentity() successful! Logging in...</strong>' ) );
-          } else {
-            $( '#notify' ).prepend( timestamp( '<strong>loginAsStoredIdentity() failed! Waiting for manual login...</strong>' ) );
-          }
+      // You can listen for login timeouts:
+      Bridge.onLoginTimeout = function () {
+        $( '#notify' ).prepend( timestamp( '<strong>login() timed out!</strong>' ) );
+        $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
+      };
 
-          // Hook up the the login process to a button:
-          $( '#login' ).click( function ( evt ) {
+      // You can listen for login success:
+      Bridge.onLoginSuccess = function ( data ) {
+        $( '#notify' ).prepend( timestamp( '<strong>login() successful!</strong>' ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
+        $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + 
+          JSON.stringify( jQuery.jStorage.get( 'axon-bridge-identity', 'Not found!' ) ) ) );
+      };
 
-            // Read in the input fields
-            var email = $( '#email' ).val();
-            var password = $( '#password' ).val();
-            var useLocalStorage = $( '#useLocalStorage' ).prop( 'checked' );
+      // You can listen for the logout() function being called:
+      Bridge.onLogoutCalled = function ( data ) {
+        $( '#notify' ).prepend( timestamp( '<strong>logout() called!</strong>' ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
+        $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + 
+          JSON.stringify( jQuery.jStorage.get( 'axon-bridge-identity', 'Not found!' ) ) ) );
+      };
 
-            // Send a login request using the API definition. See api.js for more.
-            api.login.get( email, password, useLocalStorage );
-
-          } );
-
-          // Hook up the logout process to a button:
-          $( '#logout' ).click( function ( evt ) {
-            
-            // Call Bridge.logout() to clear the user from Bridge.
-            Bridge.logout();
-
-          } );
-
-
-          // ===============
-          // EVENT CALLBACKS
-          // ===============
-          
-          // You can listen for the login function being called:
-          Bridge.onLoginCalled = function () {
-            $( '#notify' ).prepend( timestamp( '<strong>login() called!</strong>' ) );
-            $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
-          };
-
-          // You can listen for login error codes or malformed data:
-          Bridge.onLoginError = function ( error ) {
-            $( '#notify' ).prepend( timestamp( '<strong>login() error!</strong>  ' + JSON.stringify( error ) ) );
-            $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
-          };
-
-          // You can listen for login timeouts:
-          Bridge.onLoginTimeout = function () {
-            $( '#notify' ).prepend( timestamp( '<strong>login() timed out!</strong>' ) );
-            $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
-          };
-
-          // You can listen for login success:
-          Bridge.onLoginSuccess = function ( data ) {
-            $( '#notify' ).prepend( timestamp( '<strong>login() successful!</strong>' ) );
-            $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
-            $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
-            $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
-            $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + JSON.stringify( jQuery.jStorage.get( 'axon-bridge-identity', 'Not found!' ) ) ) );
-          };
-
-          // You can listen for the logout() function being called:
-          Bridge.onLogoutCalled = function ( data ) {
-            $( '#notify' ).prepend( timestamp( '<strong>logout() called!</strong>' ) );
-            $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
-            $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
-            $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
-            $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + JSON.stringify( jQuery.jStorage.get( 'axon-bridge-identity', 'Not found!' ) ) ) );
-          };
-
-          // You can listen for each request:
-          Bridge.onRequestPresend = function ( method, resource, payload ) {
-            jQuery( '#notify' ).prepend( timestamp( 'Request >> ' + method + ' resource ' + resource + ' = ' + JSON.stringify( payload ) ) );
-          };
+      // You can listen for each request:
+      Bridge.onRequestPresend = function ( method, resource, payload ) {
+        jQuery( '#notify' ).prepend( timestamp( 'Request >> ' + method + ' resource ' + resource + 
+          ' = ' + JSON.stringify( payload ) ) );
+      };
 
 
-          // =============
-          // JUST A HELPER
-          // =============
-          function timestamp ( message ) {
-            return '<p>' + new Date().toLocaleTimeString() + ': ' + message + '</p>';
-          }
-
-      } )();
+      // =============
+      // JUST A HELPER
+      // =============
+      function timestamp ( message ) {
+        return '<p>' + new Date().toLocaleTimeString() + ': ' + message + '</p>';
+      }
       
     </script>
   </body>

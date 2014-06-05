@@ -28,110 +28,142 @@ var api = {
 
   },
 
-  /*
+  // The users resource will probably be the next that you want to implement. Use this template
+  // to guide you as you begin to develop your first API route and the resource it returns.
   users: {
 
+    // [METHOD] DELETE
+    // Use this to delete existing users.
     'delete': null,
 
+    // [METHOD] GET
+    // Use this to fetch users.
     'get': function ( filters ) {
 
       // Request a login package from the server
       Bridge.request( 'GET', 'users/' + filters, {} )
       .done( function ( data, textStatus, jqXHR ) {
 
-        // isErrorCodeResponse() provides an easy way to check a broad range of status codes 
-        // that you probably want to reject. You don't have to reject the response if it returns
-        // an error, of course, but this function call will allow you to sift through most errors
-        // with a 1-liner and handle them however you like.
-        var error = Bridge.isErrorCodeResponse( jqXHR );
-        if ( error !== null || typeof data !== 'object' || typeof data.content !== 'object' ) {
+        // Set the user object using the user data that was returned, as long as the data
+        // in the response is well-formed.
+        if ( typeof data !== 'object' || typeof data.content !== 'object' ) {
 
-          // NOTE
-          // Implement handling of specific error codes here. If you need particular handling
-          // of specific error codes this is a good time to do it.
-
-          // Example:
-          console.error( "API | " + error.status.toString() + " >> " + error.message );
-
-        } 
-        else // Successful login
-        {
-
-          // NOTE
-          // Implement handling of a successful request here. Anything that needs to happen in
-          // response to this resource being returned should happen here.
-
-          // Example:
-          console.log( "API | Request successful!" );
+          // Notify the user of the login error and stop handling this here.
+          var error = { status: 417, message: '417 (Expectation Failed) Malformed response.' };
+          console.error( "API | GET Users | " + error.status.toString() + " >> " + error.message );
+          if ( typeof self.onLoginError === 'function' ) {
+            self.onLoginError( data, error );
+          }
+          return;
 
         }
+
+        // NOTE
+        // Implement handling of a successful request here. Anything that needs to happen in
+        // response to this resource being returned should happen here.
+
+        // Example:
+        console.log( "API | GET Users | Request successful!" );
 
       } )
       .failed( function ( jqXHR, textStatus, errorThrown ) {
 
-        // NOTE
-        // Implement handling of a complete request failure here. This means that no response
-        // was received from the server. The client machine's internet may be offline, of the
-        // server hosting the Bridge API may be offline.
+        // Reject the obvious error codes
+        var error = Bridge.isErrorCodeResponse( jqXHR );
+        if ( error !== null ) {
 
-        // Example:
-        console.error( "API | Error >> No response from the server." );
+          // Report the error code and message
+          console.error( "API | GET Users | " + error.status.toString() + " >> " + error.message );
+
+          // Notify the user of the login error.
+          if ( typeof self.onLoginError === 'function' ) {
+            self.onLoginError( error );
+          }
+
+        } 
+        else // Connection timeout
+        {
+
+          // Report the communication failure
+          console.error( "API | GET Users | Error >> No response from the server." );
+
+          // Notify the user of the failure to connect to the server.
+          if ( typeof self.onLoginTimeout === 'function' ) {
+            self.onLoginTimeout();
+          }
+
+        }
 
       } );
 
     },
 
+    // [METHOD] POST
+    // Use this for editing existing users.
     'post': null,
 
+    // [METHOD] PUT
+    // Use this for creation of new users.
     'put': function ( payload ) {
 
       // Request a login package from the server
-      Bridge.request( 'PUT', 'users', payload )
+      Bridge.request( 'PUT', 'users/', payload )
       .done( function ( data, textStatus, jqXHR ) {
 
-        // isErrorCodeResponse() provides an easy way to check a broad range of status codes 
-        // that you probably want to reject. You don't have to reject the response if it returns
-        // an error, of course, but this function call will allow you to sift through most errors
-        // with a 1-liner and handle them however you like.
-        var error = Bridge.isErrorCodeResponse( jqXHR );
-        if ( error !== null || typeof data !== 'object' || typeof data.content !== 'object' ) {
+        // Set the user object using the user data that was returned, as long as the data
+        // in the response is well-formed.
+        if ( typeof data !== 'object' || typeof data.content !== 'object' ) {
 
-          // NOTE
-          // Implement handling of specific error codes here. If you need particular handling
-          // of specific error codes this is a good time to do it.
-
-          // Example:
-          console.error( "API | " + error.status.toString() + " >> " + error.message );
-
-        } 
-        else // Successful login
-        {
-
-          // NOTE
-          // Implement handling of a successful request here. Anything that needs to happen in
-          // response to this resource being returned should happen here.
-
-          // Example:
-          console.log( "API | Request successful!" );
+          // Notify the user of the login error and stop handling this here.
+          var error = { status: 417, message: '417 (Expectation Failed) Malformed response.' };
+          console.error( "API | GET Users | " + error.status.toString() + " >> " + error.message );
+          if ( typeof self.onLoginError === 'function' ) {
+            self.onLoginError( data, error );
+          }
+          return;
 
         }
+
+        // NOTE
+        // Implement handling of a successful request here. Anything that needs to happen in
+        // response to this resource being returned should happen here.
+
+        // Example:
+        console.log( "API | PUT Users | Request successful!" );
 
       } )
       .failed( function ( jqXHR, textStatus, errorThrown ) {
 
-        // NOTE
-        // Implement handling of a complete request failure here. This means that no response
-        // was received from the server. The client machine's internet may be offline, of the
-        // server hosting the Bridge API may be offline.
+        // Reject the obvious error codes
+        var error = Bridge.isErrorCodeResponse( jqXHR );
+        if ( error !== null ) {
 
-        // Example:
-        console.error( "API | Error >> No response from the server." );
+          // Report the error code and message
+          console.error( "API | PUT Users | " + error.status.toString() + " >> " + error.message );
+
+          // Notify the user of the login error.
+          if ( typeof self.onLoginError === 'function' ) {
+            self.onLoginError( error );
+          }
+
+        } 
+        else // Connection timeout
+        {
+
+          // Report the communication failure
+          console.error( "API | PUT Users | Error >> No response from the server." );
+
+          // Notify the user of the failure to connect to the server.
+          if ( typeof self.onLoginTimeout === 'function' ) {
+            self.onLoginTimeout();
+          }
+
+        }
 
       } );
 
     }
 
-  };
-  */
+  }
 
 };
