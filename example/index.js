@@ -13,11 +13,6 @@ window.onload = function () {
     return '<p>' + new Date().toLocaleTimeString() + ': ' + message + '</p>';
   }
 
-  // Hook up button to clear HTML5 local storage:
-  $( '#clear-local-storage' ).click( function ( evt ) {
-    $.jStorage.deleteKey( 'bridge-client-identity' );
-  } );
-
 
   // ================
   // PROMISE HANDLERS
@@ -92,7 +87,13 @@ window.onload = function () {
       JSON.stringify( jQuery.jStorage.get( 'bridge-client-identity', 'Not found!' ) ) ) );
   };
 
-    // You can listen for the register function being called:
+  // You can listen for the recover password function being called:
+  Bridge.onRecoverPasswordCalled = function () {
+    $( '#notify' ).prepend( timestamp( '<strong>recoverPassword() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
+  };
+
+  // You can listen for the register function being called:
   Bridge.onRegisterCalled = function () {
     $( '#notify' ).prepend( timestamp( '<strong>register() called!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
@@ -102,6 +103,12 @@ window.onload = function () {
   Bridge.onRequestCalled = function ( method, resource, payload ) {
     jQuery( '#notify' ).prepend( timestamp( 'Request >> ' + method + ' resource ' + resource + 
       ' = ' + JSON.stringify( payload ) ) );
+  };
+
+  // You can listen for the verify email function being called:
+  Bridge.onVerifyEmailCalled = function () {
+    $( '#notify' ).prepend( timestamp( '<strong>verifyEmail() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
   };
 
 
@@ -134,6 +141,24 @@ window.onload = function () {
 
   } );
 
+  // Hook up the email verification to a button:
+  $( '#verify-email' ).click( function ( evt ) {
+
+    // Read in the input fields
+    var email = $( '#email3' ).val();
+    var hash = $( '#hash' ).val();
+
+    // Send a verify email request using Bridge.
+    Bridge.requestVerifyEmail( email, hash )
+      .done( function ( data, jqXHR ) {
+        $( '#notify' ).prepend( timestamp( '<strong>Email account verified successfully!</strong>' ) );
+      } )
+      .fail( function ( data, jqXHR ) {
+        $( '#notify' ).prepend( timestamp( '<strong>Verification failed...</strong>' ) );
+      } );
+
+  } );
+
   // Hook up the the login process to a button:
   $( '#login' ).click( function ( evt ) {
 
@@ -154,14 +179,6 @@ window.onload = function () {
 
   } );
 
-  // Hook up the logout process to a button:
-  $( '#logout' ).click( function ( evt ) {
-    
-    // Call Bridge.logout() to clear the user from Bridge.
-    Bridge.logout();
-
-  } );
-
   // Hook up the password change process to a button:
   $( 'change-password' ).click( function ( evt ) {
 
@@ -172,12 +189,61 @@ window.onload = function () {
     // Send a change password request using Bridge.
     Bridge.requestChangePassword( oldPassword, newPassword )
       .done( function ( data, jqXHR ) {
-
+        $( '#notify' ).prepend( timestamp( '<strong>Password changed successfully!</strong>' ) );
       } )
       .fail( function ( data, jqXHR ) {
-        
+        $( '#notify' ).prepend( timestamp( '<strong>Password change failed...</strong>' ) );
       } );
 
+  } );
+
+  // Hook up the forgot password process to a button:
+  $( '#forgot-password' ).click( function ( evt ) {
+
+    // Read in the input fields
+    var email = $( '#email5' ).val();
+
+    // Send a recover password request using Bridge.
+    Bridge.requestForgotPassword( email )
+      .done( function ( data, jqXHR ) {
+        $( '#notify' ).prepend( timestamp( '<strong>Password recovery email sent successfully!</strong>' ) );
+      } )
+      .fail( function ( data, jqXHR ) {
+        $( '#notify' ).prepend( timestamp( '<strong>Password recovery email failed to send...</strong>' ) );
+      } );
+
+  } );
+
+  // Hook up the recover email process to a button:
+  $( '#recover-password' ).click( function ( evt ) {
+
+    // Read in the input fields
+    var email = $( '#email4' ).val();
+    var newPassword = $( '#new-password2' ).val();
+    var hash = $( '#hash2' ).val();
+
+    // Send a recover password request using Bridge.
+    Bridge.requestRecoverPassword( email, newPassword, hash )
+      .done( function ( data, jqXHR ) {
+        $( '#notify' ).prepend( timestamp( '<strong>Password recovered successfully!</strong>' ) );
+      } )
+      .fail( function ( data, jqXHR ) {
+        $( '#notify' ).prepend( timestamp( '<strong>Password recovery failed...</strong>' ) );
+      } );
+
+  } );
+
+  // Hook up the logout process to a button:
+  $( '#logout' ).click( function ( evt ) {
+    
+    // Call Bridge.logout() to clear the user from Bridge.
+    Bridge.logout();
+
+  } );
+
+  // Hook up a button to clear HTML5 local storage:
+  $( '#clear-local-storage' ).click( function ( evt ) {
+    $.jStorage.deleteKey( 'bridge-client-identity' );
   } );
 
 
