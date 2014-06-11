@@ -9,22 +9,22 @@ var api = {
   // database in response to correct authentication credentials being provided.
   login: {
 
-    // [METHOD] DELETE
-    // Not implemented.
-    'delete': null,
-
     // [METHOD] GET
-    // Use the native Bridge login() call to handle this request/response.
-    // Signature: function ( email, password, useLocalStorage )
-    'get': Bridge.login,
+    // Use the native Bridge.requestLogin() call to handle this request/response.
+    // Signature: function ( email, password, useLocalStorage ) {}
+    'get': Bridge.requestLogin
 
-    // [METHOD] POST
-    // Not implemented.
-    'post': null,
+  },
+
+  // [RESOURCE] register
+  // This resource is required by Bridge to provide a way to create new users in the
+  // database securely.
+  register: {
 
     // [METHOD] PUT
-    // Not implemented.
-    'put': null
+    // Use the native Bridge.requestRegister() call to handle this request/response.
+    // Signature: function ( email, password, firstName, lastName, appData ) {}
+    'put': Bridge.requestRegister
 
   },
 
@@ -34,11 +34,16 @@ var api = {
 
     // [METHOD] DELETE
     // Use this to delete existing users.
-    'delete': null,
+    'delete': function () {
+      'use strict';
+      console.error( 'users.delete() is not implemented!' );
+    },
 
     // [METHOD] GET
     // Use this to fetch users.
     'get': function ( filters ) {
+
+      'use strict';
 
       // Request a login package from the server
       Bridge.request( 'GET', 'users/' + filters, {} )
@@ -100,11 +105,16 @@ var api = {
 
     // [METHOD] POST
     // Use this for editing existing users.
-    'post': null,
+    'post': function () {
+      'use strict';
+      console.error( 'users.post() is not implemented!' );
+    },
 
     // [METHOD] PUT
     // Use this for creation of new users.
     'put': function ( payload ) {
+
+      'use strict';
 
       // Request a login package from the server
       Bridge.request( 'PUT', 'users/', payload )

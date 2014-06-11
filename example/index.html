@@ -1,122 +1,71 @@
 <!DOCTYPE html>
 <html>
   <head>
+    
     <title>Bridge Client Example</title>
+
+    <!-- Manually include jQuery, since it's huge and CDN-able. -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    
+    <!-- Include the main Axon Bridge client library. -->
+    <script type="text/javascript" src="../lib/bridge-client.js"></script>
+    
+    <!-- Include your own API definition library. -->
+    <script type="text/javascript" src="api.js"></script>
+    
+    <!-- The code we'll use to get started with Bridge. -->
+    <script type="text/javascript" src="index.js"></script>
+
   </head>
   <body>
+
     <h1>Bridge Client Example</h1>
-    <label for="email">Email: </label>
-    <input id="email" type="text" />
-    <label for="password">Password: </label>
-    <input id="password" type="password" />
-    <label for="useLocalStorage">Use Local Storage: </label>
-    <input id="useLocalStorage" type="checkbox" />
-    <button id="login" type="button">Login</button>
-    <button id="logout" type="button">Logout</button>
+
+    <fieldset>
+      <h2><legend>Registration</legend></h2>
+      <label for="email">Email: </label>
+      <input id="email" type="text" />
+      <label for="password">Password: </label>
+      <input id="password" type="password" />
+      <label for="first-name">First Name: </label>
+      <input id="first-name" type="text" />
+      <label for="last-name">Last Name: </label>
+      <input id="last-name" type="text" />
+      <label for="app-data">App Data: </label>
+      <textarea id="app-data" rows="6" cols="50">{}</textarea>
+      <button id="register" type="button">Register</button>
+    </fieldset>
+
+    <fieldset>
+      <h2><legend>Login</legend></h2>
+      <label for="email2">Email: </label>
+      <input id="email2" type="text" />
+      <label for="password2">Password: </label>
+      <input id="password2" type="password" />
+      <label for="use-local-storage">Use Local Storage: </label>
+      <input id="use-local-storage" type="checkbox" />
+      <button id="login" type="button">Login</button>
+    </fieldset>
+
+    <fieldset>
+      <h2><legend>Change Password</legend></h2>
+      <label for="old-password">Old Password: </label>
+      <input id="old-password" type="password" />
+      <label for="new-password">New Password: </label>
+      <input id="new-password" type="password" />
+      <button id="change-password" type="button">Change Password</button>
+    </fieldset>
+
+    <fieldset>
+      <h2><legend>Utilities</legend></h2>
+      <button id="logout" type="button">Logout</button>
+      <button id="clear-local-storage" type="button">Clear HTML5 Local Storage</button>
+      <button id="forgot-password" type="button">Request Password Recovery Email</button>
+    </fieldset>
+
     <div id="notify">
       <p>Page loaded.</p>
     </div>
 
-    <!-- Manually include jQuery, since it's huge and CDN-able -->
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
-    
-    <!-- Include the main Axon Bridge client library -->
-    <script type="text/javascript" src="../lib/bridge-client.js"></script>
-    
-    <!-- Include your own API definition library -->
-    <script type="text/javascript" src="api.js"></script>
-    
-    <!-- Do something with your API! -->
-    <script type="text/javascript">
-
-      // Initialize your Bridge with the base URL of your API and a timeout (in milliseconds):
-      Bridge.init( 'https://192.168.2.34/node/api/1.0/', 10000 );
-
-      // Attempt to load up a locally stored user identity and login with that:
-      if ( Bridge.loginAsStoredIdentity() ) {
-        $( '#notify' ).prepend( timestamp( '<strong>HTML5 stored user found. Logging in...</strong>' ) );
-      } else {
-        $( '#notify' ).prepend( timestamp( '<strong>No HTML5 stored user. Waiting for manual login...</strong>' ) );
-      }
-
-      // Hook up the the login process to a button:
-      $( '#login' ).click( function ( evt ) {
-
-        // Read in the input fields
-        var email = $( '#email' ).val();
-        var password = $( '#password' ).val();
-        var useLocalStorage = $( '#useLocalStorage' ).prop( 'checked' );
-
-        // Send a login request using the API definition. See api.js for more.
-        api.login.get( email, password, useLocalStorage );
-
-      } );
-
-      // Hook up the logout process to a button:
-      $( '#logout' ).click( function ( evt ) {
-        
-        // Call Bridge.logout() to clear the user from Bridge.
-        Bridge.logout();
-
-      } );
-
-
-      // ===============
-      // EVENT CALLBACKS
-      // ===============
-      
-      // You can listen for the login function being called:
-      Bridge.onLoginCalled = function () {
-        $( '#notify' ).prepend( timestamp( '<strong>login() called!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
-      };
-
-      // You can listen for login error codes or malformed data:
-      Bridge.onLoginError = function ( error ) {
-        $( '#notify' ).prepend( timestamp( '<strong>login() error!</strong>  ' + JSON.stringify( error ) ) );
-        $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
-      };
-
-      // You can listen for login timeouts:
-      Bridge.onLoginTimeout = function () {
-        $( '#notify' ).prepend( timestamp( '<strong>login() timed out!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
-      };
-
-      // You can listen for login success:
-      Bridge.onLoginSuccess = function ( data ) {
-        $( '#notify' ).prepend( timestamp( '<strong>login() successful!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
-        $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + 
-          JSON.stringify( jQuery.jStorage.get( 'axon-bridge-identity', 'Not found!' ) ) ) );
-      };
-
-      // You can listen for the logout() function being called:
-      Bridge.onLogoutCalled = function ( data ) {
-        $( '#notify' ).prepend( timestamp( '<strong>logout() called!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
-        $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + 
-          JSON.stringify( jQuery.jStorage.get( 'axon-bridge-identity', 'Not found!' ) ) ) );
-      };
-
-      // You can listen for each request:
-      Bridge.onRequestPresend = function ( method, resource, payload ) {
-        jQuery( '#notify' ).prepend( timestamp( 'Request >> ' + method + ' resource ' + resource + 
-          ' = ' + JSON.stringify( payload ) ) );
-      };
-
-
-      // =============
-      // JUST A HELPER
-      // =============
-      function timestamp ( message ) {
-        return '<p>' + new Date().toLocaleTimeString() + ': ' + message + '</p>';
-      }
-      
-    </script>
   </body>
 </html>
