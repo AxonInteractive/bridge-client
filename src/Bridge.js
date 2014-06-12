@@ -86,7 +86,9 @@ module.exports = function () {
     }
     // No identity is available. The request can't be sent.
     else { 
-      console.warn( "BRIDGE | Request | Request cannot be sent. No user credentials available." );
+      if ( self.debug === true ) {
+        console.warn( "BRIDGE | Request | Request cannot be sent. No user credentials available." );
+      }
       return null;
     }
 
@@ -162,6 +164,14 @@ module.exports = function () {
       self.onChangePassword();
     }
 
+    // Hash the user's passwords
+    var oldHashedPassword = CryptoJS.SHA256( oldPassword ).toString( CryptoJS.enc.Hex );
+    var newHashedPassword = CryptoJS.SHA256( newPassword ).toString( CryptoJS.enc.Hex );
+
+    // Clear the unencrypted passwords from memory
+    oldPassword = null;
+    newPassword = null;
+
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
     var deferred = new jQuery.Deferred();
 
@@ -176,7 +186,7 @@ module.exports = function () {
 
       // Set Bridge's identity object using the new password, since future requests will need to be 
       // signed with the new user credentials.
-      setIdentity( identity.email, newPassword );
+      setIdentity( identity.email, newHashedPassword, true );
 
       // Log the success to the console.
       if ( self.debug === true ) {
@@ -203,13 +213,13 @@ module.exports = function () {
 
     // Build the payload object to send with the request
     var payload = {
-      "password": CryptoJS.SHA256( newPassword ).toString( CryptoJS.enc.Hex )
+      "password": newHashedPassword
     };
 
     // Configure a temporary Identity object with the user's credentials, using the password 
     // received as a parameter to double-confirm the user's identity immediately before they 
     // change their account password.
-    var tempIdentity = new Identity( identity.email, oldPassword, false );
+    var tempIdentity = new Identity( identity.email, oldHashedPassword, true );
 
     // Send the request
     requestPrivate( 'POST', 'change-password', payload, tempIdentity ).done( onDone ).fail( onFail );
@@ -292,6 +302,14 @@ module.exports = function () {
       self.onLoginCalled( email, useLocalStorage );
     }
 
+    // Hash the user's password
+    var hashedPassword = ( dontHashPassword === true ) ? password :
+      CryptoJS.SHA256( password )
+      .toString( CryptoJS.enc.Hex );
+
+    // Clear the unencrypted password from memory
+    password = null;
+
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
     var deferred = new jQuery.Deferred();
 
@@ -320,19 +338,11 @@ module.exports = function () {
       // user should be able to decline this convencience in favour of security, regardless
       // of whether they are on a public machine or not.
       if ( self.useLocalStorage ) {
-
-        // Decide whether or not to hash the password again
-        var hashedPassword = ( dontHashPassword === true ) ? password :
-          CryptoJS.SHA256( password )
-          .toString( CryptoJS.enc.Hex );
-
-        // Store the user
         jQuery.jStorage.set( 'bridge-client-identity', JSON.stringify( {
-          email: email,
-          password: hashedPassword
+          "email": email,
+          "password": hashedPassword
         } ) );
         jQuery.jStorage.setTTL( 'bridge-client-identity', 86400000 ); // Expire in 1 day.
-
       }
 
       // Signal the deferred object to use its success() handler.
@@ -364,7 +374,7 @@ module.exports = function () {
     self.useLocalStorage = useLocalStorage;
 
     // Configure an Identity object with the user's credentials.
-    setIdentity( email, password, dontHashPassword );
+    setIdentity( email, hashedPassword, true );
 
     // Send the request
     requestPrivate( 'GET', 'login', payload, null ).done( onDone ).fail( onFail );
@@ -384,6 +394,12 @@ module.exports = function () {
     if ( typeof self.onRecoverPasswordCalled === "function" ) {
       self.onRecoverPasswordCalled( email, hash );
     }
+
+    // Hash the user's password
+    var hashedPassword = CryptoJS.SHA256( password ).toString( CryptoJS.enc.Hex );
+
+    // Clear the unencrypted password from memory
+    password = null;
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
     var deferred = new jQuery.Deferred();
@@ -423,7 +439,7 @@ module.exports = function () {
     // Build the payload object to send with the request
     var payload = {
       "hash": hash,
-      "password": password
+      "password": hashedPassword
     };
 
     // Create a temporary an Identity object with a blank password.
@@ -450,6 +466,12 @@ module.exports = function () {
     if ( typeof self.onRegisterCalled === "function" ) {
       self.onRegisterCalled( email, firstName, lastName, appData );
     }
+
+    // Hash the user's password
+    var hashedPassword = CryptoJS.SHA256( password ).toString( CryptoJS.enc.Hex );
+
+    // Clear the unencrypted password from memory
+    password = null;
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
     var deferred = new jQuery.Deferred();
@@ -489,7 +511,7 @@ module.exports = function () {
     // Build the payload object to send with the request
     var payload = {
       "email": email,
-      "password": CryptoJS.SHA256( password ).toString( CryptoJS.enc.Hex ),
+      "password": hashedPassword,
       "first-name": firstName,
       "last-name": lastName,
       "app-data": appData
@@ -826,9 +848,9 @@ module.exports = function () {
 
       var parsedIdentity = JSON.parse( storedIdentity );
 
-      //console.log( parsedIdentity );
-      //console.log( parsedIdentity.email );
-      //console.log( parsedIdentity.password );
+      if ( self.debug === true ) {
+        console.log( "Stoed identity: " + JSON.stringify( parsedIdentity ) );
+      }
 
       // Send a login request using the private login call and return the deferred object
       return requestLoginPrivate( parsedIdentity.email, parsedIdentity.password, true, true );

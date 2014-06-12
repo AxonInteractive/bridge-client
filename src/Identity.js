@@ -9,6 +9,8 @@ var sha256 = require( 'include/sha256' );
 // to create requests that will authenticate the with the server securely.
 module.exports = function ( email, password, dontHashPassword ) {
 
+  'use strict';
+
   // The object to be returned from the factory
   var self = {};
 
@@ -36,7 +38,7 @@ module.exports = function ( email, password, dontHashPassword ) {
   // Although the password is local to this constructor, it is better that it not even be 
   // available in memory once it has been hashed, since the hashed password is much more 
   // difficult to recover in its original form.
-  password = undefined;
+  password = null;
 
 
   ///////////////
@@ -71,12 +73,16 @@ module.exports = function ( email, password, dontHashPassword ) {
     // [CAREFUL] hashedPassword should be a string. If it isn't, terrible things WILL happen!
     reqBody.hmac = CryptoJS.HmacSHA256( concat, hashedPassword ).toString( CryptoJS.enc.Hex );
 
-    //console.log( 'Hashpass: "' + hashedPassword + '"' );
-    //console.log( 'Content: "' + content + '"' );
-    //console.log( 'Email: "' + email + '"' );
-    //console.log( 'Time: "' + time + '"' );
-    //console.log( 'Concat: "' + concat + '"' );
-    //console.log( 'HMAC: "' + reqBody.hmac + '"' );
+    if ( Bridge.debug === true ) {
+      console.log( '=== HMAC Signing Process ===' );
+      console.log( 'Hashpass: "' + hashedPassword + '"' );
+      console.log( 'Content: "' + content + '"' );
+      console.log( 'Email: "' + email + '"' );
+      console.log( 'Time: "' + time + '"' );
+      console.log( 'Concat: "' + concat + '"' );
+      console.log( 'HMAC: "' + reqBody.hmac + '"' );
+      console.log( '============================' );
+    }
 
     return reqBody;
 
