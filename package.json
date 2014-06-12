@@ -21,7 +21,6 @@
     "jshint-stylish": "~0.2.0",
     "browserify": "~4.1.10",
     "vinyl-source-stream": "~0.1.1",
-    "gulp-if": "~1.2.1",
     "gulp-rename": "~1.2.0",
     "gulp-streamify": "0.0.5"
   }
