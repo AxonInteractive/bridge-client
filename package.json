@@ -1,7 +1,7 @@
 {
-  "name": "axon-bridge-client",
-  "version": "0.0.1",
-  "description": "The client-side application of Axon Bridge, a simple uniform interface for providing database services to Single Page Applications.",
+  "name": "bridge-client",
+  "version": "0.1.0",
+  "description": "The client-side application of Axon Bridge, a simple uniform interface for providing API services to browser-based applications.",
   "main": "bridge-client.js",
   "repository": {
     "type": "git",
@@ -10,13 +10,19 @@
   "author": {
     "name": "Axon Interactive",
     "email": "theteam@axoninteractive.ca",
-    "url": "axoninteractive.ca"
+    "url": "http://www.axoninteractive.ca"
   },
   "private": true,
   "license": "No License",
   "devDependencies": {
     "gulp": "~3.6.2",
-    "gulp-shell": "~0.2.5",
-    "gulp-clean": "~0.3.0"
+    "gulp-jshint": "~1.6.2",
+    "gulp-uglify": "~0.3.0",
+    "jshint-stylish": "~0.2.0",
+    "browserify": "~4.1.10",
+    "vinyl-source-stream": "~0.1.1",
+    "gulp-if": "~1.2.1",
+    "gulp-rename": "~1.2.0",
+    "gulp-streamify": "0.0.5"
   }
 }

@@ -1,8 +1,8 @@
 // Include dependencies
-var json3 = require( 'include/json3' );
-var jstorage = require( 'include/jstorage' );
-var sha256 = require( 'include/sha256' );
-var Identity = require( 'Identity' );
+var json3 = require( './include/json3' );
+var jstorage = require( './include/jstorage' );
+var sha256 = require( './include/sha256' );
+var Identity = require( './Identity' );
 
 // [Bridge Constructor]
 // The Bridge object is the global object through which other applications will 

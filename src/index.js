@@ -20,4 +20,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Require the root AxonBridge module
-var BridgeClient = require( 'BridgeClient' );
+//var BridgeClient = require( './BridgeClient' );
+
+var bridge = require( './Bridge' );
+module.exports = new bridge();

@@ -1,24 +1,46 @@
-// Include gulp
-var gulp = require( 'gulp' );
+( function () {
 
-// Include plugins
-var clean = require( 'gulp-clean' );
-var shell = require( 'gulp-shell' );
+  'use strict';
 
-// Build out the library unminified
-gulp.task( 'build', shell.task( [
-  'r.js.cmd -o build.js'
-] ) );
+  var browserify = require( 'browserify' );
+  var gulp = require( 'gulp' );
+  var gulpif = require( 'gulp-if' );
+  var jshint = require( 'gulp-jshint' );
+  var rename = require( 'gulp-rename' );
+  var streamify = require( 'gulp-streamify' );
+  var uglify = require( 'gulp-uglify' );
+  var source = require( 'vinyl-source-stream' );
 
-// Build out the library in minified form
-gulp.task( 'min', shell.task( [
-  'r.js.cmd -o build.min.js'
-] ) );
+  // Production mode or development mode
+  var isDevEnvironment = true;
 
-gulp.task( 'clean', function () {
-  return gulp.src( 'lib', { read: false } )
-    .pipe( clean() );
-} );
+  // Run jshint to check for any glaring errors in the JS
+  gulp.task( 'lint', function () {
+    gulp.src( './src/*.js' )
+      .pipe( jshint() )
+      .pipe( jshint.reporter( 'jshint-stylish' ) );
+  } );
 
-// Default task
-gulp.task( 'default', [ 'build' ] );
+  // Concat scripts using Browserify to manage dependencies
+  gulp.task( 'browserify', function () {
+    return browserify( './src/index.js' )
+      .bundle( {
+        "standalone": 'Bridge',
+        "debug": isDevEnvironment
+      } )
+      .pipe( source( 'bridge-client.js' ) )
+      .pipe( gulp.dest( './lib' ) )
+      .pipe( rename( 'bridge-client.min.js' ) )
+      .pipe( streamify( uglify() ) )
+      .pipe( gulp.dest( './lib' ) );
+  } );
+
+  // Watch for changes to the source or dependencies
+  gulp.task( 'watch', function () {
+    gulp.watch( [ './src/**/*.js' ], [ 'lint', 'browserify' ] );
+  } );
+
+  // Default task
+  gulp.task( 'default', [ 'lint', 'browserify', 'watch' ] );
+
+} )();

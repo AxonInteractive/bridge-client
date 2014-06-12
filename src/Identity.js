@@ -1,7 +1,7 @@
 // Include dependencies
-var hmac_sha256 = require( 'include/hmac-sha256' );
-var json3 = require( 'include/json3' );
-var sha256 = require( 'include/sha256' );
+var hmac_sha256 = require( './include/hmac-sha256' );
+var json3 = require( './include/json3' );
+var sha256 = require( './include/sha256' );
 
 // [Identity Constructor]
 // The Identity object represents an email/password pair used as identification with the
