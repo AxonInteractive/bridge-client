@@ -1,0 +1,22 @@
+{
+  "name": "bridge-client",
+  "version": "0.1.0",
+  "main": "./lib/bridge-client.min.js",
+  "ignore": [
+    "**/.*",
+    "example",
+    "lib",
+    "node_modules",
+    "src",
+    ".gitignore",
+    ".jshintrc",
+    "bridge-client.sublime-project",
+    "build.js",
+    "build.min.js",
+    "build-end.frag.js",
+    "build-start.frag.js",
+    "gulpfile.js",
+    "package.json",
+    "README.md"
+  ]
+}
