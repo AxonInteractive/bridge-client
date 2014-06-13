@@ -4,7 +4,6 @@
 
   var browserify = require( 'browserify' );
   var gulp = require( 'gulp' );
-  var gulpif = require( 'gulp-if' );
   var jshint = require( 'gulp-jshint' );
   var rename = require( 'gulp-rename' );
   var streamify = require( 'gulp-streamify' );
