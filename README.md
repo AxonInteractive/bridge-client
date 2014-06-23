@@ -1,5 +1,7 @@
 # README #
 
+See [the wiki](https://bitbucket.org/axoninteractive/bridge-client/wiki/Home) for more information about using the Bridge Client.
+
 This README would normally document whatever steps are necessary to get your application up and running.
 
 ### What is this repository for? ###
