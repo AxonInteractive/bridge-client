@@ -1,7 +1,8 @@
 // Include dependencies
+var enc_hex = require( './include/crypto-js/enc-hex' );
 var json3 = require( './include/json3' );
 var jstorage = require( './include/jstorage' );
-var sha256 = require( './include/sha256' );
+var sha256 = require( './include/crypto-js/sha256' );
 var Identity = require( './Identity' );
 
 // [Bridge Constructor]
@@ -165,8 +166,8 @@ module.exports = function () {
     }
 
     // Hash the user's passwords
-    var oldHashedPassword = CryptoJS.SHA256( oldPassword ).toString( CryptoJS.enc.Hex );
-    var newHashedPassword = CryptoJS.SHA256( newPassword ).toString( CryptoJS.enc.Hex );
+    var oldHashedPassword = sha256( oldPassword ).toString( enc_hex );
+    var newHashedPassword = sha256( newPassword ).toString( enc_hex );
 
     // Clear the unencrypted passwords from memory
     oldPassword = null;
@@ -304,8 +305,7 @@ module.exports = function () {
 
     // Hash the user's password
     var hashedPassword = ( dontHashPassword === true ) ? password :
-      CryptoJS.SHA256( password )
-      .toString( CryptoJS.enc.Hex );
+      sha256( password ).toString( enc_hex );
 
     // Clear the unencrypted password from memory
     password = null;
@@ -396,7 +396,7 @@ module.exports = function () {
     }
 
     // Hash the user's password
-    var hashedPassword = CryptoJS.SHA256( password ).toString( CryptoJS.enc.Hex );
+    var hashedPassword = sha256( password ).toString( enc_hex );
 
     // Clear the unencrypted password from memory
     password = null;
@@ -468,7 +468,7 @@ module.exports = function () {
     }
 
     // Hash the user's password
-    var hashedPassword = CryptoJS.SHA256( password ).toString( CryptoJS.enc.Hex );
+    var hashedPassword = sha256( password ).toString( enc_hex );
 
     // Clear the unencrypted password from memory
     password = null;

@@ -15,7 +15,7 @@
   "private": true,
   "license": "No License",
   "devDependencies": {
-    "gulp": "~3.6.2",
+    "gulp": "~3.8.1",
     "gulp-jshint": "~1.6.2",
     "gulp-uglify": "~0.3.0",
     "jshint-stylish": "~0.2.0",

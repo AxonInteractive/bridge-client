@@ -6,7 +6,7 @@
 //
 // Last Modified: June 4, 2014
 //
-// Dependencies:  crypto-js sha256 and hmac-sha256 (https://code.google.com/p/crypto-js/)
+// Dependencies:  crypto-js (https://github.com/evanvosberg/crypto-js)
 //                jQuery 1.11.1 (http://jquery.com/)
 //                json3 (https://github.com/bestiejs/json3)
 //                jStorage (https://github.com/andris9/jStorage)

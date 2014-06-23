@@ -1,7 +1,7 @@
 // Include dependencies
-var hmac_sha256 = require( './include/hmac-sha256' );
+var enc_hex = require( './include/crypto-js/enc-hex' );
+var hmac_sha256 = require( './include/crypto-js/hmac-sha256' );
 var json3 = require( './include/json3' );
-var sha256 = require( './include/sha256' );
 
 // [Identity Constructor]
 // The Identity object represents an email/password pair used as identification with the
@@ -32,7 +32,7 @@ module.exports = function ( email, password, dontHashPassword ) {
   // feature exists to allow passwords stored in local storage to be used for authentication, since 
   // they have already been hased in this way. DO NOT USE THIS FOR ANYTHING ELSE!
   var hashedPassword = ( dontHashPassword === true ) ? password : 
-    CryptoJS.SHA256( password ).toString( CryptoJS.enc.Hex );
+    hmac_sha256( password ).toString( enc_hex );
 
   // [SECURITY NOTE 2] The user's given password should be forgotten once it has been hashed.
   // Although the password is local to this constructor, it is better that it not even be 
@@ -71,7 +71,7 @@ module.exports = function ( email, password, dontHashPassword ) {
     // Add the 'hmac' property to the request with a value computed by salting the concat with the
     // user's hashedPassword.
     // [CAREFUL] hashedPassword should be a string. If it isn't, terrible things WILL happen!
-    reqBody.hmac = CryptoJS.HmacSHA256( concat, hashedPassword ).toString( CryptoJS.enc.Hex );
+    reqBody.hmac = hmac_sha256( concat, hashedPassword ).toString( enc_hex );
 
     if ( Bridge.debug === true ) {
       console.log( '=== HMAC Signing Process ===' );
