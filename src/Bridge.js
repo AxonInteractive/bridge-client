@@ -326,7 +326,7 @@ module.exports = function () {
     var onDone = function ( data, jqXHR ) {
 
       // Check that the content type (Login Package) is formatted correctly.
-      if ( typeof data.content.user !== 'object'|| typeof data.content.additionalData !== 'object' ) {
+      if ( typeof data.content.user !== 'object' ) {
         onFail( { status: 417, message: '417 (Expectation Failed) Malformed login package.' }, jqXHR );
         return;
       }
