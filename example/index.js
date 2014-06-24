@@ -21,7 +21,6 @@ window.onload = function () {
   var loginSuccessHandler = function ( data, jqXHR ) {
     $( '#notify' ).prepend( timestamp( '<strong>requestLogin() successful!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
-    $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
     $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + 
       JSON.stringify( jQuery.jStorage.get( 'bridge-client-identity', 'Not found!' ) ) ) );
@@ -180,7 +179,7 @@ window.onload = function () {
   } );
 
   // Hook up the password change process to a button:
-  $( 'change-password' ).click( function ( evt ) {
+  $( '#change-password' ).click( function ( evt ) {
 
     // Read in the input fields
     var oldPassword = $( '#old-password' ).val();
