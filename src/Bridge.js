@@ -100,14 +100,19 @@ module.exports = function () {
     // Build the payloadString to be sent along with the message.
     // Note: If this is a GET request, prepend 'payload=' since the data is sent in the query 
     // string.
-    var payloadString = ( method.toUpperCase() === 'GET' ) ? 'payload=' : '';
-    payloadString += JSON.stringify( requestIdentity.createRequest( payload ) );
+    var reqBody = null;
+    if ( method.toUpperCase() === 'GET' ) {
+      reqBody = 'payload=' + JSON.stringify( requestIdentity.createRequest( payload ) );
+    }
+    else {
+      reqBody = JSON.stringify( requestIdentity.createRequest( payload ) );
+    }
 
     // Send the request
     jQuery.ajax( {
       'type': method,
       'url': self.url + resource,
-      'data': payloadString,
+      'data': reqBody,
       'dataType': 'json',
       'contentType': 'application/json',
       'headers': {
@@ -214,6 +219,10 @@ module.exports = function () {
 
     // Build the payload object to send with the request
     var payload = {
+      "appData": {},
+      "email": '',
+      "firstName": '',
+      "lastName": '',
       "password": newHashedPassword
     };
 
@@ -223,7 +232,7 @@ module.exports = function () {
     var tempIdentity = new Identity( identity.email, oldHashedPassword, true );
 
     // Send the request
-    requestPrivate( 'POST', 'change-password', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'POST', 'users', payload, tempIdentity ).done( onDone ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
     return deferred.promise();
@@ -278,7 +287,7 @@ module.exports = function () {
 
     // Build the payload object to send with the request
     var payload = {
-      "email": email
+      "message": email
     };
 
     // Create a temporary Identity object with a blank password.
@@ -439,7 +448,7 @@ module.exports = function () {
     // Build the payload object to send with the request
     var payload = {
       "hash": hash,
-      "password": hashedPassword
+      "message": hashedPassword
     };
 
     // Create a temporary an Identity object with a blank password.
@@ -510,18 +519,18 @@ module.exports = function () {
 
     // Build the payload object to send with the request
     var payload = {
+      "appData": appData,
       "email": email,
-      "password": hashedPassword,
-      "first-name": firstName,
-      "last-name": lastName,
-      "app-data": appData
+      "firstName": firstName,
+      "lastName": lastName,
+      "password": hashedPassword
     };
 
     // Create a temporary an Identity object with a blank password.
     var tempIdentity = new Identity( email, '', true );
 
     // Send the request
-    requestPrivate( 'PUT', 'register', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'PUT', 'users', payload, tempIdentity ).done( onDone ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
     return deferred.promise();

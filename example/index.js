@@ -19,7 +19,7 @@ window.onload = function () {
   // ================
 
   var loginSuccessHandler = function ( data, jqXHR ) {
-    $( '#notify' ).prepend( timestamp( '<strong>login() successful!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( '<strong>requestLogin() successful!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
@@ -29,27 +29,27 @@ window.onload = function () {
 
   var loginFailHandler = function ( error, jqXHR ) {
     if ( error.status === 0 ) {
-      $( '#notify' ).prepend( timestamp( '<strong>login() timed out!</strong>' ) );
+      $( '#notify' ).prepend( timestamp( '<strong>requestLogin() timed out!</strong>' ) );
       $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
     }
     else {
-      $( '#notify' ).prepend( timestamp( '<strong>login() error!</strong>  ' + JSON.stringify( error ) ) );
+      $( '#notify' ).prepend( timestamp( '<strong>requestLogin() error!</strong>  ' + JSON.stringify( error ) ) );
       $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
     }
   };
 
   var registerSuccessHandler = function ( data, jqXHR ) {
-    $( '#notify' ).prepend( timestamp( '<strong>register() successful!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( '<strong>requestRegister() successful!</strong>' ) );
     // You could perform an immediate login after regsitration completes right here!
   };
 
   var registerFailHandler = function ( error, jqXHR ) {
     if ( error.status === 0 ) {
-      $( '#notify' ).prepend( timestamp( '<strong>register() timed out!</strong>' ) );
+      $( '#notify' ).prepend( timestamp( '<strong>requestRegister() timed out!</strong>' ) );
       $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
     } 
     else {
-      $( '#notify' ).prepend( timestamp( '<strong>register() error!</strong>  ' + JSON.stringify( error ) ) );
+      $( '#notify' ).prepend( timestamp( '<strong>requestRegister() error!</strong>  ' + JSON.stringify( error ) ) );
       $( '#notify' ).prepend( timestamp( 'Registration request failed...' ) );
     }
   };
@@ -61,19 +61,19 @@ window.onload = function () {
 
   // You can listen for the changePassword function being called:
   Bridge.onChangePasswordCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>changePassword() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( '<strong>requestChangePassword() called!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
   };
 
   // You can listen for the forgotPassword function being called:
   Bridge.onForgotPasswordCalled = function ( email ) {
-    $( '#notify' ).prepend( timestamp( '<strong>forgotPassword() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( '<strong>requestForgotPassword() called!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
   };
   
   // You can listen for the login function being called:
   Bridge.onLoginCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>login() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( '<strong>requestLogin() called!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
   };
 
@@ -89,13 +89,13 @@ window.onload = function () {
 
   // You can listen for the recover password function being called:
   Bridge.onRecoverPasswordCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>recoverPassword() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( '<strong>requestRecoverPassword() called!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
   };
 
   // You can listen for the register function being called:
   Bridge.onRegisterCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>register() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( '<strong>requestRegister() called!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
   };
 
@@ -107,7 +107,7 @@ window.onload = function () {
 
   // You can listen for the verify email function being called:
   Bridge.onVerifyEmailCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>verifyEmail() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( '<strong>requestVerifyEmail() called!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
   };
 
@@ -127,7 +127,7 @@ window.onload = function () {
     var password = $( '#password' ).val();
     var firstName = $( '#first-name' ).val();
     var lastName = $( '#last-name' ).val();
-    var appData = $( '#app-data' ).val();
+    var appData = JSON.parse( $( '#app-data' ).val() );
 
     // Send a register request using Bridge.
     Bridge.requestRegister( email, password, firstName, lastName, appData )
