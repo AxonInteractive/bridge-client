@@ -133,11 +133,6 @@ window.onload = function () {
       .done( registerSuccessHandler )
       .fail( registerFailHandler );
 
-    // If you include api.js as your 3rd Party API definition, you could also write this as:
-    //api.register.put( email, password, firstName, lastName, appData )
-    //  .done( registerSuccessHandler )
-    //  .fail( registerFailHandler );
-
   } );
 
   // Hook up the email verification to a button:
@@ -150,10 +145,14 @@ window.onload = function () {
     // Send a verify email request using Bridge.
     Bridge.requestVerifyEmail( email, hash )
       .done( function ( data, jqXHR ) {
+        
         $( '#notify' ).prepend( timestamp( '<strong>Email account verified successfully!</strong>' ) );
+
       } )
       .fail( function ( data, jqXHR ) {
+
         $( '#notify' ).prepend( timestamp( '<strong>Verification failed...</strong>' ) );
+
       } );
 
   } );
@@ -171,11 +170,6 @@ window.onload = function () {
       .done( loginSuccessHandler )
       .fail( loginFailHandler );
 
-    // If you include api.js as your 3rd Party API definition, you could also write this as:
-    //api.login.get( email, password, useLocalStorage )
-    //  .done( loginSuccessHandler )
-    //  .fail( loginFailHandler );
-
   } );
 
   // Hook up the password change process to a button:
@@ -188,10 +182,14 @@ window.onload = function () {
     // Send a change password request using Bridge.
     Bridge.requestChangePassword( oldPassword, newPassword )
       .done( function ( data, jqXHR ) {
+
         $( '#notify' ).prepend( timestamp( '<strong>Password changed successfully!</strong>' ) );
+
       } )
       .fail( function ( data, jqXHR ) {
+
         $( '#notify' ).prepend( timestamp( '<strong>Password change failed...</strong>' ) );
+
       } );
 
   } );
@@ -205,10 +203,14 @@ window.onload = function () {
     // Send a recover password request using Bridge.
     Bridge.requestForgotPassword( email )
       .done( function ( data, jqXHR ) {
+
         $( '#notify' ).prepend( timestamp( '<strong>Password recovery email sent successfully!</strong>' ) );
+
       } )
       .fail( function ( data, jqXHR ) {
+
         $( '#notify' ).prepend( timestamp( '<strong>Password recovery email failed to send...</strong>' ) );
+
       } );
 
   } );
@@ -224,10 +226,14 @@ window.onload = function () {
     // Send a recover password request using Bridge.
     Bridge.requestRecoverPassword( email, newPassword, hash )
       .done( function ( data, jqXHR ) {
+
         $( '#notify' ).prepend( timestamp( '<strong>Password recovered successfully!</strong>' ) );
+
       } )
       .fail( function ( data, jqXHR ) {
+
         $( '#notify' ).prepend( timestamp( '<strong>Password recovery failed...</strong>' ) );
+
       } );
 
   } );
@@ -242,7 +248,10 @@ window.onload = function () {
 
   // Hook up a button to clear HTML5 local storage:
   $( '#clear-local-storage' ).click( function ( evt ) {
+
+    // Delete the HTML5 local storage key Bridge uses to store a user
     $.jStorage.deleteKey( 'bridge-client-identity' );
+
   } );
 
 
@@ -253,12 +262,17 @@ window.onload = function () {
   // Attempt to load up a locally stored user identity and login with that:
   var loginPromise = Bridge.requestLoginStoredIdentity();
   if ( loginPromise === null ) {
+
     $( '#notify' ).prepend( timestamp( '<strong>No HTML5 stored user. Waiting for manual login...</strong>' ) );
+
   }
   else {
+
     $( '#notify' ).prepend( timestamp( '<strong>HTML5 stored user found. Logging in...</strong>' ) );
+
     // Attach handlers to the login promise, if you like.
     loginPromise.done( loginSuccessHandler ).fail( loginFailHandler );
+
   }
 
 };

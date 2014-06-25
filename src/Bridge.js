@@ -232,7 +232,7 @@ module.exports = function () {
     var tempIdentity = new Identity( identity.email, oldHashedPassword, true );
 
     // Send the request
-    requestPrivate( 'POST', 'users', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'PUT', 'users', payload, tempIdentity ).done( onDone ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
     return deferred.promise();
@@ -294,7 +294,7 @@ module.exports = function () {
     var tempIdentity = new Identity( email, '', true );
 
     // Send the request
-    requestPrivate( 'POST', 'forgot-password', payload, null ).done( onDone ).fail( onFail );
+    requestPrivate( 'PUT', 'forgot-password', payload, null ).done( onDone ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
     return deferred.promise();
@@ -455,7 +455,7 @@ module.exports = function () {
     var tempIdentity = new Identity( email, '', true );
 
     // Send the request
-    requestPrivate( 'POST', 'recover-password', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'PUT', 'recover-password', payload, tempIdentity ).done( onDone ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
     return deferred.promise();
@@ -530,7 +530,7 @@ module.exports = function () {
     var tempIdentity = new Identity( email, '', true );
 
     // Send the request
-    requestPrivate( 'PUT', 'users', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'POST', 'users', payload, tempIdentity ).done( onDone ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
     return deferred.promise();
@@ -591,7 +591,7 @@ module.exports = function () {
     var tempIdentity = new Identity( email, '', true );
 
     // Send the request
-    requestPrivate( 'POST', 'verify-email', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'PUT', 'verify-email', payload, tempIdentity ).done( onDone ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
     return deferred.promise();
