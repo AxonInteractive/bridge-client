@@ -875,7 +875,7 @@ module.exports = function () {
   // The public requestRecoverPassword() function used to hide requestRecoverPasswordPrivate().
   self.requestRecoverPassword = function ( email, password, hash ) {
 
-    requestRecoverPasswordPrivate( email, password, hash );
+    return requestRecoverPasswordPrivate( email, password, hash );
 
   };
 
