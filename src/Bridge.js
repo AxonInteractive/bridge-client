@@ -76,6 +76,10 @@ module.exports = function () {
       self.onRequestCalled( method, resource, payload );
     }
 
+    // Create a deferred object to provide a convenient way for the caller to handle success and 
+    // failure.
+    var deferred = new jQuery.Deferred();
+
     // If a temporary identity was provided, use it (even if an identity is set in Bridge).
     var requestIdentity = null;
     if ( tempIdentity !== null && typeof tempIdentity === 'object' ) {
@@ -90,12 +94,9 @@ module.exports = function () {
       if ( self.debug === true ) {
         console.warn( "BRIDGE | Request | Request cannot be sent. No user credentials available." );
       }
-      return null;
+      deferred.reject( { status: 412, message: '412 (Precondition Failed) Null user identity.' }, null );
+      return deferred.promise();
     }
-
-    // Create a deferred object to provide a convenient way for the caller to handle success and 
-    // failure.
-    var deferred = new jQuery.Deferred();
 
     // Build the payloadString to be sent along with the message.
     // Note: If this is a GET request, prepend 'payload=' since the data is sent in the query 
@@ -196,7 +197,7 @@ module.exports = function () {
 
       // Log the success to the console.
       if ( self.debug === true ) {
-        console.log( "BRIDGE | Forgot Password | " + data.content.message );
+        console.log( "BRIDGE | Change Password | " + data.content.message );
       }
 
       // Signal the deferred object to use its success() handler.
@@ -209,7 +210,7 @@ module.exports = function () {
 
       // Log the error to the console.
       if ( Bridge.debug === true ) {
-        console.error( "BRIDGE | Forgot Password | " + error.status.toString() + " >> " + error.message );
+        console.error( "BRIDGE | Change Password | " + error.status.toString() + " >> " + error.message );
       }
 
       // Signal the deferred object to use its fail() handler.
@@ -294,7 +295,7 @@ module.exports = function () {
     var tempIdentity = new Identity( email, '', true );
 
     // Send the request
-    requestPrivate( 'PUT', 'forgot-password', payload, null ).done( onDone ).fail( onFail );
+    requestPrivate( 'PUT', 'forgot-password', payload, tempIdentity ).done( onDone ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
     return deferred.promise();
