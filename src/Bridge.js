@@ -292,7 +292,7 @@ module.exports = function () {
     };
 
     // Create a temporary Identity object with a blank password.
-    var tempIdentity = new Identity( email, '', true );
+    var tempIdentity = new Identity( '', '', true );
 
     // Send the request
     requestPrivate( 'PUT', 'forgot-password', payload, tempIdentity ).done( onDone ).fail( onFail );
@@ -453,7 +453,7 @@ module.exports = function () {
     };
 
     // Create a temporary an Identity object with a blank password.
-    var tempIdentity = new Identity( email, '', true );
+    var tempIdentity = new Identity( '', '', true );
 
     // Send the request
     requestPrivate( 'PUT', 'recover-password', payload, tempIdentity ).done( onDone ).fail( onFail );
@@ -528,7 +528,7 @@ module.exports = function () {
     };
 
     // Create a temporary an Identity object with a blank password.
-    var tempIdentity = new Identity( email, '', true );
+    var tempIdentity = new Identity( '', '', true );
 
     // Send the request
     requestPrivate( 'POST', 'users', payload, tempIdentity ).done( onDone ).fail( onFail );
@@ -589,7 +589,7 @@ module.exports = function () {
     };
 
     // Create a temporary an Identity object with a blank password.
-    var tempIdentity = new Identity( email, '', true );
+    var tempIdentity = new Identity( '', '', true );
 
     // Send the request
     requestPrivate( 'PUT', 'verify-email', payload, tempIdentity ).done( onDone ).fail( onFail );
