@@ -32,7 +32,7 @@ module.exports = function ( email, password, dontHashPassword ) {
   // feature exists to allow passwords stored in local storage to be used for authentication, since 
   // they have already been hased in this way. DO NOT USE THIS FOR ANYTHING ELSE!
   var hashedPassword = ( dontHashPassword === true ) ? password : 
-    hmac_sha256( password ).toString( enc_hex );
+    sha256( password ).toString( enc_hex );
 
   // [SECURITY NOTE 2] The user's given password should be forgotten once it has been hashed.
   // Although the password is local to this constructor, it is better that it not even be 
