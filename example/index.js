@@ -65,7 +65,7 @@ window.onload = function () {
   };
 
   // You can listen for the forgotPassword function being called:
-  Bridge.onForgotPasswordCalled = function ( email ) {
+  Bridge.onForgotPasswordCalled = function () {
     $( '#notify' ).prepend( timestamp( '<strong>requestForgotPassword() called!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
   };
@@ -77,7 +77,7 @@ window.onload = function () {
   };
 
   // You can listen for the logout() function being called:
-  Bridge.onLogoutCalled = function ( data ) {
+  Bridge.onLogoutCalled = function () {
     $( '#notify' ).prepend( timestamp( '<strong>logout() called!</strong>' ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );

@@ -398,11 +398,11 @@ module.exports = function () {
   // To be called by the page at the address which an account recovery email links the user
   // to. They will have entered their new password to an input field, and the email and hash will 
   // have been made available to the page in the query string of the URL.
-  var requestRecoverPasswordPrivate = function ( email, password, hash ) {
+  var requestRecoverPasswordPrivate = function ( password, hash ) {
 
     // Notify the user of the recover password call occurring.
     if ( typeof self.onRecoverPasswordCalled === "function" ) {
-      self.onRecoverPasswordCalled( email, hash );
+      self.onRecoverPasswordCalled( hash );
     }
 
     // Hash the user's password
@@ -541,11 +541,11 @@ module.exports = function () {
   // [PRIVATE] requestVerifyEmailPrivate()
   // To be called by the page the at address which an email verification email links the user to.
   // The user will be sent to this page with their email and a hash in the query string of the URL.
-  var requestVerifyEmailPrivate = function ( email, hash ) {
+  var requestVerifyEmailPrivate = function ( hash ) {
 
     // Notify the user of the verify email call occurring.
     if ( typeof self.onVerifyEmailCalled === "function" ) {
-      self.onVerifyEmailCalled( email, hash );
+      self.onVerifyEmailCalled( hash );
     }
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
@@ -874,9 +874,9 @@ module.exports = function () {
 
   // [PUBLIC] requestRecoverPassword()
   // The public requestRecoverPassword() function used to hide requestRecoverPasswordPrivate().
-  self.requestRecoverPassword = function ( email, password, hash ) {
+  self.requestRecoverPassword = function ( password, hash ) {
 
-    return requestRecoverPasswordPrivate( email, password, hash );
+    return requestRecoverPasswordPrivate( password, hash );
 
   };
 
@@ -890,9 +890,9 @@ module.exports = function () {
 
   // [PUBLIC] requestVerifyEmail()
   // The public requestVerifyEmail() function used to hide requestVerifyEmailPrivate().
-  self.requestVerifyEmail = function ( email, hash ) {
+  self.requestVerifyEmail = function ( hash ) {
 
-    return requestVerifyEmailPrivate( email, hash );
+    return requestVerifyEmailPrivate( hash );
 
   };
 

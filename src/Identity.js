@@ -2,6 +2,7 @@
 var enc_hex = require( './include/crypto-js/enc-hex' );
 var hmac_sha256 = require( './include/crypto-js/hmac-sha256' );
 var json3 = require( './include/json3' );
+var sha256 = require( './include/crypto-js/sha256' );
 
 // [Identity Constructor]
 // The Identity object represents an email/password pair used as identification with the

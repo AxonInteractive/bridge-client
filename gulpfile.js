@@ -21,7 +21,7 @@
   } );
 
   // Concat scripts using Browserify to manage dependencies
-  gulp.task( 'browserify', function () {
+  gulp.task( 'build', function () {
     return browserify( './src/index.js' )
       .bundle( {
         "standalone": 'Bridge',
@@ -36,10 +36,10 @@
 
   // Watch for changes to the source or dependencies
   gulp.task( 'watch', function () {
-    gulp.watch( [ './src/**/*.js' ], [ 'lint', 'browserify' ] );
+    gulp.watch( [ './src/**/*.js' ], [ 'lint', 'build' ] );
   } );
 
   // Default task
-  gulp.task( 'default', [ 'lint', 'browserify', 'watch' ] );
+  gulp.task( 'default', [ 'lint', 'build', 'watch' ] );
 
 } )();
