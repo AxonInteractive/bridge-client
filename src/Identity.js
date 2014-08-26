@@ -1,8 +1,7 @@
 // Include dependencies
-var enc_hex = require( './include/crypto-js/enc-hex' );
-var hmac_sha256 = require( './include/crypto-js/hmac-sha256' );
-var json3 = require( './include/json3' );
-var sha256 = require( './include/crypto-js/sha256' );
+var CryptoEncHex = require( './include/crypto-js/enc-hex' );
+var CryptoHmacSha256 = require( './include/crypto-js/hmac-sha256' );
+var CryptoSha256 = require( './include/crypto-js/sha256' );
 
 // [Identity Constructor]
 // The Identity object represents an email/password pair used as identification with the
@@ -33,7 +32,7 @@ module.exports = function ( email, password, dontHashPassword ) {
   // feature exists to allow passwords stored in local storage to be used for authentication, since 
   // they have already been hased in this way. DO NOT USE THIS FOR ANYTHING ELSE!
   var hashedPassword = ( dontHashPassword === true ) ? password : 
-    sha256( password ).toString( enc_hex );
+    CryptoSha256( password ).toString( CryptoEncHex );
 
   // [SECURITY NOTE 2] The user's given password should be forgotten once it has been hashed.
   // Although the password is local to this constructor, it is better that it not even be 
@@ -46,7 +45,7 @@ module.exports = function ( email, password, dontHashPassword ) {
   // FUNCTIONS //
   ///////////////
 
-  // [PRIVATE] hmacSignRequestBody()
+  // [PRIVATE] hmacSignHeader()
   // Returns the given request object after adding the "hmac" property to it and setting "hmac" 
   // by using the user's password as a SHA-256 HMAC hashing secret.
   // [SECURITY NOTE 3] The HMAC string is a hex value, 64 characters in length. It is created 
@@ -56,12 +55,12 @@ module.exports = function ( email, password, dontHashPassword ) {
   // Pseudocode:
   // toHash = Request Content JSON + Request Email + Request Time JSON
   // salt = hashedPassword
-  // hmacString = sha256( toHash, salt )
+  // hmacString = CryptoSha256( toHash, salt )
   // request.hmac = hmacString
   // 
   // By performing the same operation on the data, the server can confirm that the HMAC strings 
   // are identical and authorize the request.
-  var hmacSignRequestBody = function ( reqBody ) {
+  var hmacSignHeader = function ( reqBody ) {
 
     // Create the concatenated string to be hashed as the HMAC
     var content = JSON.stringify( reqBody.content );
@@ -72,7 +71,7 @@ module.exports = function ( email, password, dontHashPassword ) {
     // Add the 'hmac' property to the request with a value computed by salting the concat with the
     // user's hashedPassword.
     // [CAREFUL] hashedPassword should be a string. If it isn't, terrible things WILL happen!
-    reqBody.hmac = hmac_sha256( concat, hashedPassword ).toString( enc_hex );
+    reqBody.hmac = CryptoHmacSha256( concat, hashedPassword ).toString( CryptoEncHex );
 
     if ( Bridge.debug === true ) {
       console.log( '=== HMAC Signing Process ===' );
@@ -107,13 +106,13 @@ module.exports = function ( email, password, dontHashPassword ) {
   // FUNCTIONS //
   ///////////////
 
-  // [PUBLIC] createRequest()
+  // [PUBLIC] createHeader()
   // Returns a new request, given the content payload of the request as an object. Utilizes
-  // hmacSignRequest() to wrap the given payload in an appropriate header to validate against the
+  // hmacSignHeader() to wrap the given payload in an appropriate header to validate against the
   // server-side authorization scheme (assuming the user credentials are correct).
-  self.createRequest = function ( payload ) {
+  self.createHeader = function ( payload ) {
 
-    return hmacSignRequestBody( {
+    return hmacSignHeader( {
       'content': payload,
       'email': email,
       'time': new Date()

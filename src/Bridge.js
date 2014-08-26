@@ -1,9 +1,11 @@
 // Include dependencies
-var enc_hex = require( './include/crypto-js/enc-hex' );
-var json3 = require( './include/json3' );
-var jstorage = require( './include/jstorage' );
-var sha256 = require( './include/crypto-js/sha256' );
+var CryptoEncHex = require( './include/crypto-js/enc-hex' );
+var CryptoSha256 = require( './include/crypto-js/sha256' );
+var Q = require( './include/q' );
 var Identity = require( './Identity' );
+
+// Configure Q to provide promise strack traces in full.
+Q.longStackSupport = true;
 
 // [Bridge Constructor]
 // The Bridge object is the global object through which other applications will 
@@ -69,20 +71,16 @@ module.exports = function () {
   // request function calls. It performs an XHR request to the API server at the specified resource
   // and return a jQuery Deferred object . If this returns null, the request could not be sent
   // because no user credentials were available to sign the request.
+  // This function is responsible for handling all generic Bridge errors.
   var requestPrivate = function ( method, resource, payload, tempIdentity ) {
-
-    // Notify the user of the request being ready to send.
-    if ( typeof self.onRequestCalled === "function" ) {
-      self.onRequestCalled( method, resource, payload );
-    }
 
     // Create a deferred object to provide a convenient way for the caller to handle success and 
     // failure.
-    var deferred = new jQuery.Deferred();
+    var deferred = new Q.defer();
 
     // If a temporary identity was provided, use it (even if an identity is set in Bridge).
     var requestIdentity = null;
-    if ( tempIdentity !== null && typeof tempIdentity === 'object' ) {
+    if ( identity !== null && typeof tempIdentity === 'object' ) {
       requestIdentity = tempIdentity;
     }
     // If an identity is set in Bridge, use it.
@@ -95,67 +93,75 @@ module.exports = function () {
         console.warn( "BRIDGE | Request | Request cannot be sent. No user credentials available." );
       }
       deferred.reject( { status: 412, message: '412 (Precondition Failed) Null user identity.' }, null );
-      return deferred.promise();
+      return deferred.promise;
     }
 
-    // Build the payloadString to be sent along with the message.
-    // Note: If this is a GET request, prepend 'payload=' since the data is sent in the query 
-    // string.
-    var reqBody = null;
-    if ( method.toUpperCase() === 'GET' ) {
-      reqBody = 'payload=' + JSON.stringify( requestIdentity.createRequest( payload ) );
-    }
-    else {
-      reqBody = JSON.stringify( requestIdentity.createRequest( payload ) );
-    }
+    // Create and sign the request header to attach to the XHR request.
+    var signedHeader = requestIdentity.createHeader( payload );
 
-    // Send the request
-    jQuery.ajax( {
-      'type': method,
-      'url': self.url + resource,
-      'data': reqBody,
-      'dataType': 'json',
-      'contentType': 'application/json',
-      'headers': {
-        'Accept': 'application/json'
-      },
-      'timeout': self.timeout,
-      'async': true,
-    } )
-    .done( function ( data, textStatus, jqXHR ) {
+    // Handle a successful XHR request
+    var onThen = function ( resBody ) {
 
-      // Check if the returned header was formatted incorrectly.
-      if ( typeof data !== 'object' || typeof data.content !== 'object' ) {
-        deferred.reject( { status: 417, message: '417 (Expectation Failed) Malformed message.' }, jqXHR );
+      var data = null;
+      // If the resBody is an object, use it as the data object.
+      if ( typeof resBody === 'object' ) {
+        data = resBody;
+      }
+      // If the resBody is a string, attempt to parse it as JSON and use it as the data object. If 
+      // it fails to parse as valid JSON, the response is malformed.
+      else if ( typeof resBody === 'string' ) {
+        try {
+          data = JSON.parse( resBody );
+        }
+        catch ( e ) {
+          onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' } );
+          return;
+        }
+      }
+      // If the resBody is of any other data type, the response is malformed.
+      else {
+        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' } );
         return;
       }
 
-      // Notify the user of the successful request.
-      deferred.resolve( data, jqXHR );
+      // Log the success to the console.
+      if ( self.debug === true ) {
+        console.log( "BRIDGE | Response | " + data.content );
+      }
+      
+      // Notify the user of the request about to be sent.
+      if ( typeof self.onRequestCalled === "function" ) {
+        self.onRequestCalled( method, resource, signedHeader );
+      }
+      
+      // Resolve the deferred and return the body of the response parsed as JSON and the XHR.
+      deferred.resolve( data );
 
-    } )
-    .fail( function ( jqXHR, textStatus, errorThrown ) {
+    };
 
-      // Reject the obvious error codes.
-      var error = Bridge.isErrorCodeResponse( jqXHR );
-      if ( error !== null ) {
+    // Handle a failed XHR request
+    var onFail = function ( error ) { 
 
-        // Notify the user of the error.
-        deferred.reject( error, jqXHR );
-
-      } 
-      else // Connection timeout
-      {
-
-        // Notify the user of the failure to connect to the server.
-        deferred.reject( { status: 0, message: '0 (Timeout) No response from the server.' }, jqXHR );
-
+      // If a null error is provided, assume this is a timeout.
+      if ( error === null && typeof error !== 'undefined' ) {
+        error = { status: 0, message: '0 (Timeout) No response from the server.' };
       }
 
-    } );
+      // Debug error output
+      if ( Bridge.debug === true ) {
+        console.error( "BRIDGE | Request | " + error.status.toString() + " >> " + error.message );
+      }
 
-    // Return the deferred object to the caller
-    return deferred.promise();
+      // Reject the deferred and return the error object matching this status code and the XHR.
+      deferred.reject( error );
+
+    };
+
+    // Send the request
+    self.createRequest( method, resource, signedHeader ).then( onThen ).fail( onFail );
+
+    // Return the promise object to the caller
+    return deferred.promise;
 
   };
 
@@ -172,22 +178,22 @@ module.exports = function () {
     }
 
     // Hash the user's passwords
-    var oldHashedPassword = sha256( oldPassword ).toString( enc_hex );
-    var newHashedPassword = sha256( newPassword ).toString( enc_hex );
+    var oldHashedPassword = CryptoSha256( oldPassword ).toString( CryptoEncHex );
+    var newHashedPassword = CryptoSha256( newPassword ).toString( CryptoEncHex );
 
     // Clear the unencrypted passwords from memory
     oldPassword = null;
     newPassword = null;
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new jQuery.Deferred();
+    var deferred = new Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
-    var onDone = function ( data, jqXHR ) {
+    var onThen = function ( data ) {
 
       // Check that the content type (Message) is formatted correctly.
       if ( typeof data.content.message !== 'string' ) {
-        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' }, jqXHR );
+        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' } );
         return;
       }
 
@@ -201,20 +207,20 @@ module.exports = function () {
       }
 
       // Signal the deferred object to use its success() handler.
-      deferred.resolve( data, jqXHR );
+      deferred.resolve( data );
 
     };
 
     // Build our internal failure handler (this calls deferred.reject())
-    var onFail = function ( error, jqXHR ) {
+    var onFail = function ( error ) {
 
       // Log the error to the console.
       if ( Bridge.debug === true ) {
         console.error( "BRIDGE | Change Password | " + error.status.toString() + " >> " + error.message );
       }
 
-      // Signal the deferred object to use its fail() handler.
-      deferred.reject( error, jqXHR );
+      // Signal the deferred object to use its catch() handler.
+      deferred.reject( error );
 
     };
 
@@ -233,10 +239,10 @@ module.exports = function () {
     var tempIdentity = new Identity( identity.email, oldHashedPassword, true );
 
     // Send the request
-    requestPrivate( 'PUT', 'users', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'PUT', 'users', payload, tempIdentity ).then( onThen ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
-    return deferred.promise();
+    return deferred.promise;
 
   };
 
@@ -252,14 +258,14 @@ module.exports = function () {
     }
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new jQuery.Deferred();
+    var deferred = new Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
-    var onDone = function ( data, jqXHR ) {
+    var onThen = function ( data ) {
 
       // Check that the content type (Message) is formatted correctly.
       if ( typeof data.content.message !== 'string' ) {
-        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' }, jqXHR );
+        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' } );
         return;
       }
 
@@ -269,20 +275,20 @@ module.exports = function () {
       }
 
       // Signal the deferred object to use its success() handler.
-      deferred.resolve( data, jqXHR );
+      deferred.resolve( data );
 
     };
 
     // Build our internal failure handler (this calls deferred.reject())
-    var onFail = function ( error, jqXHR ) {
+    var onFail = function ( error ) {
 
       // Log the error to the console.
       if ( Bridge.debug === true ) {
         console.error( "BRIDGE | Forgot Password | " + error.status.toString() + " >> " + error.message );
       }
 
-      // Signal the deferred object to use its fail() handler.
-      deferred.reject( error, jqXHR );
+      // Signal the deferred object to use its catch() handler.
+      deferred.reject( error );
 
     };
 
@@ -295,10 +301,10 @@ module.exports = function () {
     var tempIdentity = new Identity( '', '', true );
 
     // Send the request
-    requestPrivate( 'PUT', 'forgot-password', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'PUT', 'forgot-password', payload, tempIdentity ).then( onThen ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
-    return deferred.promise();
+    return deferred.promise;
 
   };
 
@@ -315,20 +321,20 @@ module.exports = function () {
 
     // Hash the user's password
     var hashedPassword = ( dontHashPassword === true ) ? password :
-      sha256( password ).toString( enc_hex );
+      CryptoSha256( password ).toString( CryptoEncHex );
 
     // Clear the unencrypted password from memory
     password = null;
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new jQuery.Deferred();
+    var deferred = new Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
-    var onDone = function ( data, jqXHR ) {
+    var onThen = function ( data ) {
 
       // Check that the content type (Login Package) is formatted correctly.
       if ( typeof data.content.user !== 'object' ) {
-        onFail( { status: 417, message: '417 (Expectation Failed) Malformed login package.' }, jqXHR );
+        onFail( { status: 417, message: '417 (Expectation Failed) Malformed login package.' } );
         return;
       }
 
@@ -341,27 +347,30 @@ module.exports = function () {
       setUser( data.content.user, data.content.additionalData );
 
       // Store this identity to local storage, if that was requested.
-      // [SECURITY NOTE 1] storeLocally should be set based on user input, by asking whether
+      // [SECURITY NOTE 1] useLocalStorage should be set based on user input, by asking whether 
       // the user is on a private computer or not. This is can be considered a tolerable
       // security risk as long as the user is on a private computer that they trust or manage
       // themselves. However, on a public machine this is probably a security risk, and the
       // user should be able to decline this convencience in favour of security, regardless
       // of whether they are on a public machine or not.
       if ( self.useLocalStorage ) {
-        jQuery.jStorage.set( 'bridge-client-identity', JSON.stringify( {
-          "email": email,
-          "password": hashedPassword
+        localStorage.setItem( 'bridge-client-identity', JSON.stringify( {
+          'ttl': 86400000, // Expire in 1 day
+          'now': new Date(), // From now
+          'value': { // Store this data
+            "email": email,
+            "password": hashedPassword
+          }
         } ) );
-        jQuery.jStorage.setTTL( 'bridge-client-identity', 86400000 ); // Expire in 1 day.
       }
 
       // Signal the deferred object to use its success() handler.
-      deferred.resolve( data, jqXHR );
+      deferred.resolve( data );
 
     };
 
     // Build our internal failure handler (this calls deferred.reject())
-    var onFail = function ( error, jqXHR ) {
+    var onFail = function ( error ) {
 
       // Clear the user credentials, since they didn't work anyway.
       clearUser();
@@ -371,8 +380,8 @@ module.exports = function () {
         console.error( "BRIDGE | Login | " + error.status.toString() + " >> " + error.message );
       }
 
-      // Signal the deferred object to use its fail() handler.
-      deferred.reject( error, jqXHR );
+      // Signal the deferred object to use its catch() handler.
+      deferred.reject( error );
 
     };
 
@@ -387,10 +396,10 @@ module.exports = function () {
     setIdentity( email, hashedPassword, true );
 
     // Send the request
-    requestPrivate( 'GET', 'login', payload, null ).done( onDone ).fail( onFail );
+    requestPrivate( 'GET', 'login', payload, null ).then( onThen ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
-    return deferred.promise();
+    return deferred.promise;
 
   };
 
@@ -406,20 +415,20 @@ module.exports = function () {
     }
 
     // Hash the user's password
-    var hashedPassword = sha256( password ).toString( enc_hex );
+    var hashedPassword = CryptoSha256( password ).toString( CryptoEncHex );
 
     // Clear the unencrypted password from memory
     password = null;
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new jQuery.Deferred();
+    var deferred = new Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
-    var onDone = function ( data, jqXHR ) {
+    var onThen = function ( data ) {
 
       // Check that the content type (Message) is formatted correctly.
       if ( typeof data.content.message !== 'string' ) {
-        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' }, jqXHR );
+        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' } );
         return;
       }
 
@@ -429,20 +438,20 @@ module.exports = function () {
       }
 
       // Signal the deferred object to use its success() handler.
-      deferred.resolve( data, jqXHR );
+      deferred.resolve( data );
 
     };
 
     // Build our internal failure handler (this calls deferred.reject())
-    var onFail = function ( error, jqXHR ) {
+    var onFail = function ( error ) {
 
       // Log the error to the console.
       if ( Bridge.debug === true ) {
         console.error( "BRIDGE | Recover Password | " + error.status.toString() + " >> " + error.message );
       }
 
-      // Signal the deferred object to use its fail() handler.
-      deferred.reject( error, jqXHR );
+      // Signal the deferred object to use its catch() handler.
+      deferred.reject( error );
 
     };
 
@@ -456,10 +465,10 @@ module.exports = function () {
     var tempIdentity = new Identity( '', '', true );
 
     // Send the request
-    requestPrivate( 'PUT', 'recover-password', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'PUT', 'recover-password', payload, tempIdentity ).then( onThen ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
-    return deferred.promise();
+    return deferred.promise;
 
   };
 
@@ -478,20 +487,20 @@ module.exports = function () {
     }
 
     // Hash the user's password
-    var hashedPassword = sha256( password ).toString( enc_hex );
+    var hashedPassword = CryptoSha256( password ).toString( CryptoEncHex );
 
     // Clear the unencrypted password from memory
     password = null;
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new jQuery.Deferred();
+    var deferred = new Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
-    var onDone = function ( data, jqXHR ) {
+    var onThen = function ( data ) {
 
       // Check that the content type (Message) is formatted correctly.
       if ( typeof data.content.message !== 'string' ) {
-        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' }, jqXHR );
+        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' } );
         return;
       }
 
@@ -501,20 +510,20 @@ module.exports = function () {
       }
 
       // Signal the deferred object to use its success() handler.
-      deferred.resolve( data, jqXHR );
+      deferred.resolve( data );
 
     };
 
     // Build our internal failure handler (this calls deferred.reject())
-    var onFail = function ( error, jqXHR ) {
+    var onFail = function ( error ) {
 
       // Log the error to the console.
       if ( Bridge.debug === true ) {
         console.error( "BRIDGE | Register | " + error.status.toString() + " >> " + error.message );
       }
 
-      // Signal the deferred object to use its fail() handler.
-      deferred.reject( error, jqXHR );
+      // Signal the deferred object to use its catch() handler.
+      deferred.reject( error );
 
     };
 
@@ -531,10 +540,10 @@ module.exports = function () {
     var tempIdentity = new Identity( '', '', true );
 
     // Send the request
-    requestPrivate( 'POST', 'users', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'POST', 'users', payload, tempIdentity ).then( onThen ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
-    return deferred.promise();
+    return deferred.promise;
 
   };
 
@@ -549,14 +558,14 @@ module.exports = function () {
     }
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new jQuery.Deferred();
+    var deferred = new Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
-    var onDone = function ( data, jqXHR ) {
+    var onThen = function ( data ) {
 
       // Check that the content type (Message) is formatted correctly.
       if ( typeof data.content.message !== 'string' ) {
-        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' }, jqXHR );
+        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' } );
         return;
       }
 
@@ -566,20 +575,20 @@ module.exports = function () {
       }
 
       // Signal the deferred object to use its success() handler.
-      deferred.resolve( data, jqXHR );
+      deferred.resolve( data );
 
     };
 
     // Build our internal failure handler (this calls deferred.reject())
-    var onFail = function ( error, jqXHR ) {
+    var onFail = function ( error ) {
 
       // Log the error to the console.
       if ( Bridge.debug === true ) {
         console.error( "BRIDGE | Verify Email | " + error.status.toString() + " >> " + error.message );
       }
 
-      // Signal the deferred object to use its fail() handler.
-      deferred.reject( error, jqXHR );
+      // Signal the deferred object to use its catch() handler.
+      deferred.reject( error );
 
     };
 
@@ -592,10 +601,10 @@ module.exports = function () {
     var tempIdentity = new Identity( '', '', true );
 
     // Send the request
-    requestPrivate( 'PUT', 'verify-email', payload, tempIdentity ).done( onDone ).fail( onFail );
+    requestPrivate( 'PUT', 'verify-email', payload, tempIdentity ).then( onThen ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
-    return deferred.promise();
+    return deferred.promise;
 
   };
 
@@ -704,12 +713,10 @@ module.exports = function () {
   //////////
 
   // [PUBLIC] init()
-  // Configure theb Bridge with a new URL and timeout.
-  self.init = function ( url, timeout ) {
-
-    self.url = url;
+  // Sets up the essential Bridge Client variables.
+  self.init = function ( timeout, url ) {
     self.timeout = timeout;
-
+    self.url = url;
   };
 
 
@@ -717,18 +724,80 @@ module.exports = function () {
   // FUNCTIONS //
   ///////////////
 
+  // [PUBLIC] createRequest()
+  // This function provides the lowest-level interface to the XHR functionality that the Bridge 
+  // Client is operating on top of. This function is responsible only for issuing a request and 
+  // returning a Q promise and hooking up the resolve() and reject() methods to the results of the 
+  // XHR request.
+  // Note: Any function assigned to this variable must accept the same 3 arguments, and it must 
+  // return a promise that matches the Q promise interface (must have then() and catch() at least).
+  self.createRequest = function( method, resource, signedHeader ) {
+
+    // Create a new XhrHttpRequest and a Q deferred to wrap it.
+    var xhr = new XMLHttpRequest();
+    var deferred = Q.defer();
+
+    // Configure the XHR request
+    xhr.open( method.toUpperCase(), self.url + resource, true );
+    xhr.setRequestHeader( 'Accept', 'application/json' );
+    xhr.setRequestHeader( 'Bridge', JSON.stringify( signedHeader ) );
+
+    // Assign the callback for all onreadystatechange XHR events
+    xhr.onreadystatechange = function () {
+      // Only when the XHR state transitions to completed
+      if ( xhr.readyState !== 4 ) {
+        // Use isErrorCodeResponse() to screen for error codes that might be returned by the Bridge 
+        // Server. If the status code we got back can't be classified as anything hy 
+        // isErrorCodeResponse(), a null error is returned and we can consider the response a
+        // successful communication.
+        var error = self.isErrorCodeResponse( xhr.status );
+        if ( error !== null ) {
+          deferred.reject( error );
+        }
+        else {
+          deferred.resolve( xhr.responseText );
+        }
+      }
+    };
+
+    // Assign the callback for all onerror XHR events
+    xhr.onerror = function () { 
+      // Use isErrorCodeResponse() to screen for error codes that might be returned by the Bridge 
+      // Server. If the status code we got back can't be classified as anything hy 
+      // isErrorCodeResponse(), a null error is returned and the Bridge Client will handle the 
+      // problem internally.
+      var error = self.isErrorCodeResponse( xhr.status );
+      deferred.reject( error );
+    };
+    
+    // Send the request out into the network
+    xhr.send();
+
+    // Return the promise object to the caller 
+    return deferred.promise;
+
+  };
+
+  // [PUBLIC] createRequestHeader()
+  // Returns a new request header wrapped around the payload passed in.
+  self.createRequestHeader = function( payload ) {
+
+    return identity.createHeader( payload );
+
+  };
+
   // [PUBLIC] isErrorCodeResponse()
-  // Returns an Error object if the provided jqXHR has a status code between 400 and 599
+  // Returns an Error object if the provided xhr has a status code between 400 and 599
   // (inclusive). Since the 400 and 500 series status codes represent errors of various kinds,
   // this acts as a catch-all filter for common error cases to be handled by the client.
   // Returns null if the response status is not between 400 and 599 (inclusive).
   // Error format: { status: 404, message: "The resource you requested was not found." }
-  self.isErrorCodeResponse = function ( jqXHR ) {
+  self.isErrorCodeResponse = function ( status ) {
 
     // Return an Error object if the status code is between 400 and 599 (inclusive).
-    if ( jqXHR.status >= 400 && jqXHR.status < 600 ) {
+    if ( status >= 400 ) {
 
-      switch ( jqXHR.status ) {
+      switch ( status ) {
       case 400:
         return {
           status: 400,
@@ -766,8 +835,8 @@ module.exports = function () {
         };
       default:
         return {
-          status: jqXHR.status,
-          message: 'Error! Something went wrong!'
+          status: status,
+          message: 'Error! Something went wrong, but we don\'t know why!'
         };
       }
     }
@@ -801,7 +870,7 @@ module.exports = function () {
 
     // Clear the identity from local storage to preserve the user's password security.
     // If no identity is stored, this will do nothing.
-    jQuery.jStorage.deleteKey( 'bridge-client-identity' );
+    localStorage.removeItem( 'bridge-client-identity' );
 
     // Notify the user of the logout action.
     if ( typeof self.onLogoutCalled === 'function' ) {
@@ -814,7 +883,7 @@ module.exports = function () {
   // Sends an XHR request using jQuery.ajax() to the given API resource using the given 
   // HTTP method. The HTTP request body will be set to the JSON.stringify()ed request 
   // that is generated by the Identity object set to perform HMAC signing.
-  // Returns a jQuery jqZHR object. See http://api.jquery.com/jQuery.ajax/#jqXHR.
+  // Returns the XhrHttpRequest object that the request represents.
   // If no Identity is set, sendRequest() returns null, indicating no request was sent.
   self.request = function ( method, resource, payload ) {
 
@@ -853,13 +922,13 @@ module.exports = function () {
   self.requestLoginStoredIdentity = function () {
 
     // Check if an identity is in local storage to use for authentication.
-    var storedIdentity = jQuery.jStorage.get( 'bridge-client-identity', null );
+    var storedIdentity = localStorage.getItem( 'bridge-client-identity' );
     if ( storedIdentity !== null ) {
 
       var parsedIdentity = JSON.parse( storedIdentity );
 
       if ( self.debug === true ) {
-        console.log( "Stoed identity: " + JSON.stringify( parsedIdentity ) );
+        console.log( "Stored identity: " + JSON.stringify( parsedIdentity ) );
       }
 
       // Send a login request using the private login call and return the deferred object
