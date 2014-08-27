@@ -80,7 +80,7 @@ module.exports = function () {
 
     // If a temporary identity was provided, use it (even if an identity is set in Bridge).
     var requestIdentity = null;
-    if ( identity !== null && typeof tempIdentity === 'object' ) {
+    if ( identity !== null && typeof tempIdentity !== 'undefined' ) {
       requestIdentity = tempIdentity;
     }
     // If an identity is set in Bridge, use it.
@@ -158,7 +158,7 @@ module.exports = function () {
     };
 
     // Send the request
-    self.createRequest( method, resource, signedHeader ).then( onThen ).fail( onFail );
+    self.createRequest( method, self.url + resource, signedHeader ).then( onThen ).fail( onFail );
 
     // Return the promise object to the caller
     return deferred.promise;
@@ -396,7 +396,7 @@ module.exports = function () {
     setIdentity( email, hashedPassword, true );
 
     // Send the request
-    requestPrivate( 'GET', 'login', payload, null ).then( onThen ).fail( onFail );
+    requestPrivate( 'GET', 'login', payload ).then( onThen ).fail( onFail );
 
     // Return the deferred object so the end-user can handle errors as they choose.
     return deferred.promise;
@@ -714,7 +714,7 @@ module.exports = function () {
 
   // [PUBLIC] init()
   // Sets up the essential Bridge Client variables.
-  self.init = function ( timeout, url ) {
+  self.init = function ( url, timeout ) {
     self.timeout = timeout;
     self.url = url;
   };
@@ -731,17 +731,18 @@ module.exports = function () {
   // XHR request.
   // Note: Any function assigned to this variable must accept the same 3 arguments, and it must 
   // return a promise that matches the Q promise interface (must have then() and catch() at least).
-  self.createRequest = function( method, resource, signedHeader ) {
+  self.createRequest = function( method, url, signedHeader ) {
 
     // Create a new XhrHttpRequest and a Q deferred to wrap it.
     var xhr = new XMLHttpRequest();
     var deferred = Q.defer();
 
     // Configure the XHR request
-    xhr.open( method.toUpperCase(), self.url + resource, true );
+    xhr.open( method.toUpperCase(), url, true );
     xhr.setRequestHeader( 'Accept', 'application/json' );
     xhr.setRequestHeader( 'Bridge', JSON.stringify( signedHeader ) );
-
+    xhr.timeout = self.timeout;
+    
     // Assign the callback for all onreadystatechange XHR events
     xhr.onreadystatechange = function () {
       // Only when the XHR state transitions to completed
@@ -762,6 +763,16 @@ module.exports = function () {
 
     // Assign the callback for all onerror XHR events
     xhr.onerror = function () { 
+      // Use isErrorCodeResponse() to screen for error codes that might be returned by the Bridge 
+      // Server. If the status code we got back can't be classified as anything hy 
+      // isErrorCodeResponse(), a null error is returned and the Bridge Client will handle the 
+      // problem internally.
+      var error = self.isErrorCodeResponse( xhr.status );
+      deferred.reject( error );
+    };
+
+    // Assign the callback for all ontimeout XHR events
+    xhr.ontimeout = function () { 
       // Use isErrorCodeResponse() to screen for error codes that might be returned by the Bridge 
       // Server. If the status code we got back can't be classified as anything hy 
       // isErrorCodeResponse(), a null error is returned and the Bridge Client will handle the 

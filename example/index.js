@@ -1,3 +1,5 @@
+/* global $:false */
+
 // Run this once the window is ready
 window.onload = function () {
 
@@ -23,7 +25,7 @@ window.onload = function () {
     $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
     $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + 
-      JSON.stringify( jQuery.jStorage.get( 'bridge-client-identity', 'Not found!' ) ) ) );
+      JSON.stringify( localStorage.get( 'bridge-client-identity' ) ) ) );
   };
 
   var loginFailHandler = function ( error, jqXHR ) {
@@ -83,7 +85,7 @@ window.onload = function () {
     $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
     $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + 
-      JSON.stringify( jQuery.jStorage.get( 'bridge-client-identity', 'Not found!' ) ) ) );
+      JSON.stringify( localStorage.get( 'bridge-client-identity' ) ) ) );
   };
 
   // You can listen for the recover password function being called:
@@ -100,7 +102,7 @@ window.onload = function () {
 
   // You can listen for each request:
   Bridge.onRequestCalled = function ( method, resource, payload ) {
-    jQuery( '#notify' ).prepend( timestamp( 'Request >> ' + method + ' resource ' + resource + 
+    $( '#notify' ).prepend( timestamp( 'Request >> ' + method + ' resource ' + resource + 
       ' = ' + JSON.stringify( payload ) ) );
   };
 
@@ -130,7 +132,7 @@ window.onload = function () {
 
     // Send a register request using Bridge.
     Bridge.requestRegister( email, password, firstName, lastName, appData )
-      .done( registerSuccessHandler )
+      .then( registerSuccessHandler )
       .fail( registerFailHandler );
 
   } );
@@ -144,7 +146,7 @@ window.onload = function () {
 
     // Send a verify email request using Bridge.
     Bridge.requestVerifyEmail( email, hash )
-      .done( function ( data, jqXHR ) {
+      .then( function ( data, jqXHR ) {
         
         $( '#notify' ).prepend( timestamp( '<strong>Email account verified successfully!</strong>' ) );
 
@@ -167,7 +169,7 @@ window.onload = function () {
 
     // Send a login request using Bridge.
     Bridge.requestLogin( email, password, useLocalStorage )
-      .done( loginSuccessHandler )
+      .then( loginSuccessHandler )
       .fail( loginFailHandler );
 
   } );
@@ -181,7 +183,7 @@ window.onload = function () {
 
     // Send a change password request using Bridge.
     Bridge.requestChangePassword( oldPassword, newPassword )
-      .done( function ( data, jqXHR ) {
+      .then( function ( data, jqXHR ) {
 
         $( '#notify' ).prepend( timestamp( '<strong>Password changed successfully!</strong>' ) );
 
@@ -202,7 +204,7 @@ window.onload = function () {
 
     // Send a recover password request using Bridge.
     Bridge.requestForgotPassword( email )
-      .done( function ( data, jqXHR ) {
+      .then( function ( data, jqXHR ) {
 
         $( '#notify' ).prepend( timestamp( '<strong>Password recovery email sent successfully!</strong>' ) );
 
@@ -225,7 +227,7 @@ window.onload = function () {
 
     // Send a recover password request using Bridge.
     Bridge.requestRecoverPassword( email, newPassword, hash )
-      .done( function ( data, jqXHR ) {
+      .then( function ( data, jqXHR ) {
 
         $( '#notify' ).prepend( timestamp( '<strong>Password recovered successfully!</strong>' ) );
 

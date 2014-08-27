@@ -48,7 +48,7 @@
 
   // Watch for changes to the source or dependencies
   gulp.task( 'watch', function () {
-    gulp.watch( [ './src/**/*.js' ], [ 'lint', 'core', 'plugins' ] );
+    gulp.watch( [ './src/**/*.js', './example/**/*' ], [ 'lint', 'coreDev', 'plugins' ] );
   } );
 
   // Default task
