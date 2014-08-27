@@ -25,7 +25,7 @@ window.onload = function () {
     $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
     $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + 
-      JSON.stringify( localStorage.get( 'bridge-client-identity' ) ) ) );
+      JSON.stringify( localStorage.getItem( 'bridge-client-identity' ) ) ) );
   };
 
   var loginFailHandler = function ( error, jqXHR ) {
@@ -84,8 +84,8 @@ window.onload = function () {
     $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
     $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
-    $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' + 
-      JSON.stringify( localStorage.get( 'bridge-client-identity' ) ) ) );
+    $( '#notify' ).prepend( timestamp( 'HTML5 stored identity: ' + 
+      JSON.stringify( localStorage.getItem( 'bridge-client-identity' ) ) ) );
   };
 
   // You can listen for the recover password function being called:
@@ -118,7 +118,7 @@ window.onload = function () {
   // =====
 
   // Initialize your Bridge with the base URL of your API and a timeout (in milliseconds):
-  Bridge.init( 'https://192.168.2.34/node/api/1.0/', 10000 );
+  Bridge.init( 'https://192.168.2.18:3000/api/1.0/', 10000 );
 
   // Hook up the registration process to a button:
   $( '#register' ).click( function ( evt ) {
@@ -145,13 +145,13 @@ window.onload = function () {
     var hash = $( '#hash' ).val();
 
     // Send a verify email request using Bridge.
-    Bridge.requestVerifyEmail( email, hash )
-      .then( function ( data, jqXHR ) {
+    Bridge.requestVerifyEmail( hash )
+      .then( function ( data ) {
         
         $( '#notify' ).prepend( timestamp( '<strong>Email account verified successfully!</strong>' ) );
 
       } )
-      .fail( function ( data, jqXHR ) {
+      .fail( function ( error ) {
 
         $( '#notify' ).prepend( timestamp( '<strong>Verification failed...</strong>' ) );
 
@@ -218,21 +218,20 @@ window.onload = function () {
   } );
 
   // Hook up the recover email process to a button:
-  $( '#recover-password' ).click( function ( evt ) {
+  $( '#recover-password' ).click( function ( event ) {
 
     // Read in the input fields
-    var email = $( '#email4' ).val();
     var newPassword = $( '#new-password2' ).val();
     var hash = $( '#hash2' ).val();
 
     // Send a recover password request using Bridge.
-    Bridge.requestRecoverPassword( email, newPassword, hash )
-      .then( function ( data, jqXHR ) {
+    Bridge.requestRecoverPassword( newPassword, hash )
+      .then( function ( data ) {
 
         $( '#notify' ).prepend( timestamp( '<strong>Password recovered successfully!</strong>' ) );
 
       } )
-      .fail( function ( data, jqXHR ) {
+      .fail( function ( error ) {
 
         $( '#notify' ).prepend( timestamp( '<strong>Password recovery failed...</strong>' ) );
 
@@ -241,7 +240,7 @@ window.onload = function () {
   } );
 
   // Hook up the logout process to a button:
-  $( '#logout' ).click( function ( evt ) {
+  $( '#logout' ).click( function ( event ) {
     
     // Call Bridge.logout() to clear the user from Bridge.
     Bridge.logout();

@@ -80,7 +80,7 @@ module.exports = function () {
 
     // If a temporary identity was provided, use it (even if an identity is set in Bridge).
     var requestIdentity = null;
-    if ( identity !== null && typeof tempIdentity !== 'undefined' ) {
+    if ( tempIdentity !== null && typeof tempIdentity !== 'undefined' ) {
       requestIdentity = tempIdentity;
     }
     // If an identity is set in Bridge, use it.
@@ -114,13 +114,13 @@ module.exports = function () {
           data = JSON.parse( resBody );
         }
         catch ( e ) {
-          onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' } );
+          onFail( { status: 417, message: '417 (Expectation Failed) Malformed message (couldn\'t parse as JSON).' } );
           return;
         }
       }
       // If the resBody is of any other data type, the response is malformed.
       else {
-        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message.' } );
+        onFail( { status: 417, message: '417 (Expectation Failed) Malformed message (response wasn\'t an object).' } );
         return;
       }
 
@@ -177,14 +177,6 @@ module.exports = function () {
       self.onChangePassword();
     }
 
-    // Hash the user's passwords
-    var oldHashedPassword = CryptoSha256( oldPassword ).toString( CryptoEncHex );
-    var newHashedPassword = CryptoSha256( newPassword ).toString( CryptoEncHex );
-
-    // Clear the unencrypted passwords from memory
-    oldPassword = null;
-    newPassword = null;
-
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
     var deferred = new Q.defer();
 
@@ -223,6 +215,20 @@ module.exports = function () {
       deferred.reject( error );
 
     };
+
+    // Check is the user is logged in before attempting to change their password.
+    if ( !self.isLoggedIn() ) {
+      onFail( { status: 412, message: '412 (Precondition Failed) Null user identity.' } );
+      return deferred.promise;
+    }
+
+    // Hash the user's passwords
+    var oldHashedPassword = CryptoSha256( oldPassword ).toString( CryptoEncHex );
+    var newHashedPassword = CryptoSha256( newPassword ).toString( CryptoEncHex );
+
+    // Clear the unencrypted passwords from memory
+    oldPassword = null;
+    newPassword = null;
 
     // Build the payload object to send with the request
     var payload = {
@@ -746,13 +752,19 @@ module.exports = function () {
     // Assign the callback for all onreadystatechange XHR events
     xhr.onreadystatechange = function () {
       // Only when the XHR state transitions to completed
-      if ( xhr.readyState !== 4 ) {
+      if ( xhr.readyState === 4 ) {
         // Use isErrorCodeResponse() to screen for error codes that might be returned by the Bridge 
         // Server. If the status code we got back can't be classified as anything hy 
         // isErrorCodeResponse(), a null error is returned and we can consider the response a
         // successful communication.
         var error = self.isErrorCodeResponse( xhr.status );
         if ( error !== null ) {
+          try {
+            error = JSON.parse( xhr.responseText );
+          }
+          catch ( e ) {
+            deferred.reject( error );
+          }
           deferred.reject( error );
         }
         else {
