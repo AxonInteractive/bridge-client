@@ -805,7 +805,7 @@ module.exports = function () {
   // Returns a new request header wrapped around the payload passed in.
   self.createRequestHeader = function( payload ) {
 
-    return ( self.hasIdentity() ) ? identity.createHeader( payload ) : {};
+    return ( hasIdentity() ) ? identity.createHeader( payload ) : {};
 
   };
 
