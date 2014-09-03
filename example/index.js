@@ -16,46 +16,6 @@ window.onload = function () {
   }
 
 
-  // ================
-  // PROMISE HANDLERS
-  // ================
-
-  var loginSuccessHandler = function ( data, jqXHR ) {
-    $( '#notify' ).prepend( timestamp( '<strong>requestLogin() successful!</strong>' ) );
-    $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
-    $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
-    $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' +
-      JSON.stringify( localStorage.getItem( 'bridge-client-identity' ) ) ) );
-  };
-
-  var loginFailHandler = function ( error, jqXHR ) {
-    if ( error.status === 0 ) {
-      $( '#notify' ).prepend( timestamp( '<strong>requestLogin() timed out!</strong>' ) );
-      $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
-    }
-    else {
-      $( '#notify' ).prepend( timestamp( '<strong>requestLogin() error!</strong>  ' + JSON.stringify( error ) ) );
-      $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
-    }
-  };
-
-  var registerSuccessHandler = function ( data, jqXHR ) {
-    $( '#notify' ).prepend( timestamp( '<strong>requestRegister() successful!</strong>' ) );
-    // You could perform an immediate login after regsitration completes right here!
-  };
-
-  var registerFailHandler = function ( error, jqXHR ) {
-    if ( error.status === 0 ) {
-      $( '#notify' ).prepend( timestamp( '<strong>requestRegister() timed out!</strong>' ) );
-      $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
-    }
-    else {
-      $( '#notify' ).prepend( timestamp( '<strong>requestRegister() error!</strong>  ' + JSON.stringify( error ) ) );
-      $( '#notify' ).prepend( timestamp( 'Registration request failed...' ) );
-    }
-  };
-
-
   // ===============
   // EVENT CALLBACKS
   // ===============
@@ -81,11 +41,7 @@ window.onload = function () {
   // You can listen for the logout() function being called:
   Bridge.onLogoutCalled = function () {
     $( '#notify' ).prepend( timestamp( '<strong>logout() called!</strong>' ) );
-    $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
-    $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
-    $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
-    $( '#notify' ).prepend( timestamp( 'HTML5 stored identity: ' +
-      JSON.stringify( localStorage.getItem( 'bridge-client-identity' ) ) ) );
+    $( '#notify' ).prepend( timestamp( 'Waiting for the logout operation to complete...' ) );
   };
 
   // You can listen for the recover password function being called:
@@ -132,8 +88,20 @@ window.onload = function () {
 
     // Send a register request using Bridge.
     Bridge.requestRegister( email, password, firstName, lastName, appData )
-      .then( registerSuccessHandler )
-      .fail( registerFailHandler );
+      .then( function ( data ) {
+        $( '#notify' ).prepend( timestamp( '<strong>requestRegister() successful!</strong>' ) );
+        // You could perform an immediate login after regsitration completes right here!
+      } )
+      .fail( function ( error ) {
+        if ( error.status === 0 ) {
+          $( '#notify' ).prepend( timestamp( '<strong>requestRegister() timed out!</strong>' ) );
+          $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
+        }
+        else {
+          $( '#notify' ).prepend( timestamp( '<strong>requestRegister() error!</strong>  ' + JSON.stringify( error ) ) );
+          $( '#notify' ).prepend( timestamp( 'Registration request failed...' ) );
+        }
+      } ); 
 
   } );
 
@@ -169,8 +137,23 @@ window.onload = function () {
 
     // Send a login request using Bridge.
     Bridge.requestLogin( email, password, useLocalStorage )
-      .then( loginSuccessHandler )
-      .fail( loginFailHandler );
+      .then( function ( error ) {
+        if ( error.status === 0 ) {
+          $( '#notify' ).prepend( timestamp( '<strong>requestLogin() timed out!</strong>' ) );
+          $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
+        }
+        else {
+          $( '#notify' ).prepend( timestamp( '<strong>requestLogin() error!</strong>  ' + JSON.stringify( error ) ) );
+          $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
+        }
+      } )
+      .fail( function ( data ) {
+        $( '#notify' ).prepend( timestamp( '<strong>requestLogin() successful!</strong>' ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
+        $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' +
+          JSON.stringify( localStorage.getItem( 'bridge-client-identity' ) ) ) );
+      } );
 
   } );
 
@@ -183,15 +166,11 @@ window.onload = function () {
 
     // Send a change password request using Bridge.
     Bridge.requestChangePassword( oldPassword, newPassword )
-      .then( function ( data, jqXHR ) {
-
+      .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>Password changed successfully!</strong>' ) );
-
       } )
-      .fail( function ( data, jqXHR ) {
-
+      .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Password change failed...</strong>' ) );
-
       } );
 
   } );
@@ -204,15 +183,11 @@ window.onload = function () {
 
     // Send a recover password request using Bridge.
     Bridge.requestForgotPassword( email )
-      .then( function ( data, jqXHR ) {
-
+      .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>Password recovery email sent successfully!</strong>' ) );
-
       } )
-      .fail( function ( data, jqXHR ) {
-
+      .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Password recovery email failed to send...</strong>' ) );
-
       } );
 
   } );
@@ -227,32 +202,32 @@ window.onload = function () {
     // Send a recover password request using Bridge.
     Bridge.requestRecoverPassword( newPassword, hash )
       .then( function ( data ) {
-
         $( '#notify' ).prepend( timestamp( '<strong>Password recovered successfully!</strong>' ) );
-
       } )
       .fail( function ( error ) {
-
         $( '#notify' ).prepend( timestamp( '<strong>Password recovery failed...</strong>' ) );
-
       } );
 
   } );
 
   // Hook up the logout process to a button:
   $( '#logout' ).click( function ( event ) {
-
     // Call Bridge.logout() to clear the user from Bridge.
-    Bridge.logout();
-
+    Bridge.logout()
+      .then( function () {
+        $( '#notify' ).prepend( timestamp( '<strong>logout() successful!</strong>' ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.additionalData: ' + JSON.stringify( Bridge.additionalData ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
+        $( '#notify' ).prepend( timestamp( 'HTML5 stored identity: ' +
+          JSON.stringify( localStorage.getItem( 'bridge-client-identity' ) ) ) );
+      } );
   } );
 
   // Hook up a button to clear HTML5 local storage:
-  $( '#clear-local-storage' ).click( function ( evt ) {
-
+  $( '#clear-local-storage' ).click( function ( event ) {
     // Delete the HTML5 local storage key Bridge uses to store a user
     $.jStorage.deleteKey( 'bridge-client-identity' );
-
   } );
 
 

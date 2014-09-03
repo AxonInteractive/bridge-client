@@ -885,6 +885,14 @@ module.exports = function () {
   // user to authorize requests.
   self.logout = function () {
 
+    // Create a deferred object to return so the end-user can handle success/failure conveniently.
+    var deferred = new Q.defer();
+
+    // Notify the user of the logout action.
+    if ( typeof self.onLogoutCalled === 'function' ) {
+      self.onLogoutCalled();
+    }
+
     // Delete the Identity object to preserve the user's password security.
     clearIdentity();
 
@@ -895,10 +903,11 @@ module.exports = function () {
     // If no identity is stored, this will do nothing.
     localStorage.removeItem( 'bridge-client-identity' );
 
-    // Notify the user of the logout action.
-    if ( typeof self.onLogoutCalled === 'function' ) {
-      self.onLogoutCalled();
-    }
+    // Resolve the promise since this operation cannot fail
+    deferred.resolve();
+
+    // Return the deferred object so the end-user can handle errors as they choose.
+    return deferred.promise;
 
   };
 
