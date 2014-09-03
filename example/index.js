@@ -16,59 +16,6 @@ window.onload = function () {
   }
 
 
-  // ===============
-  // EVENT CALLBACKS
-  // ===============
-
-  // You can listen for the changePassword function being called:
-  Bridge.onChangePasswordCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>requestChangePassword() called!</strong>' ) );
-    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
-  };
-
-  // You can listen for the forgotPassword function being called:
-  Bridge.onForgotPasswordCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>requestForgotPassword() called!</strong>' ) );
-    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
-  };
-
-  // You can listen for the login function being called:
-  Bridge.onLoginCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>requestLogin() called!</strong>' ) );
-    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
-  };
-
-  // You can listen for the logout() function being called:
-  Bridge.onLogoutCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>logout() called!</strong>' ) );
-    $( '#notify' ).prepend( timestamp( 'Waiting for the logout operation to complete...' ) );
-  };
-
-  // You can listen for the recover password function being called:
-  Bridge.onRecoverPasswordCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>requestRecoverPassword() called!</strong>' ) );
-    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
-  };
-
-  // You can listen for the register function being called:
-  Bridge.onRegisterCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>requestRegister() called!</strong>' ) );
-    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
-  };
-
-  // You can listen for each request:
-  Bridge.onRequestCalled = function ( method, resource, payload ) {
-    $( '#notify' ).prepend( timestamp( 'Request >> ' + method + ' resource ' + resource +
-      ' = ' + JSON.stringify( payload ) ) );
-  };
-
-  // You can listen for the verify email function being called:
-  Bridge.onVerifyEmailCalled = function () {
-    $( '#notify' ).prepend( timestamp( '<strong>requestVerifyEmail() called!</strong>' ) );
-    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
-  };
-
-
   // =====
   // USAGE
   // =====
@@ -106,7 +53,7 @@ window.onload = function () {
   } );
 
   // Hook up the email verification to a button:
-  $( '#verify-email' ).click( function ( evt ) {
+  $( '#verify-email' ).click( function ( event ) {
 
     // Read in the input fields
     var email = $( '#email3' ).val();
@@ -115,20 +62,16 @@ window.onload = function () {
     // Send a verify email request using Bridge.
     Bridge.requestVerifyEmail( hash )
       .then( function ( data ) {
-
         $( '#notify' ).prepend( timestamp( '<strong>Email account verified successfully!</strong>' ) );
-
       } )
       .fail( function ( error ) {
-
         $( '#notify' ).prepend( timestamp( '<strong>Verification failed...</strong>' ) );
-
       } );
 
   } );
 
   // Hook up the the login process to a button:
-  $( '#login' ).click( function ( evt ) {
+  $( '#login' ).click( function ( event ) {
 
     // Read in the input fields
     var email = $( '#email2' ).val();
@@ -137,7 +80,14 @@ window.onload = function () {
 
     // Send a login request using Bridge.
     Bridge.requestLogin( email, password, useLocalStorage )
-      .then( function ( error ) {
+      .then( function ( data ) {
+        $( '#notify' ).prepend( timestamp( '<strong>requestLogin() successful!</strong>' ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
+        $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' +
+          JSON.stringify( localStorage.getItem( 'bridge-client-identity' ) ) ) );
+      } )
+      .fail( function ( error ) {
         if ( error.status === 0 ) {
           $( '#notify' ).prepend( timestamp( '<strong>requestLogin() timed out!</strong>' ) );
           $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
@@ -146,19 +96,12 @@ window.onload = function () {
           $( '#notify' ).prepend( timestamp( '<strong>requestLogin() error!</strong>  ' + JSON.stringify( error ) ) );
           $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
         }
-      } )
-      .fail( function ( data ) {
-        $( '#notify' ).prepend( timestamp( '<strong>requestLogin() successful!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
-        $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' +
-          JSON.stringify( localStorage.getItem( 'bridge-client-identity' ) ) ) );
       } );
 
   } );
 
   // Hook up the password change process to a button:
-  $( '#change-password' ).click( function ( evt ) {
+  $( '#change-password' ).click( function ( event ) {
 
     // Read in the input fields
     var oldPassword = $( '#old-password' ).val();
@@ -176,7 +119,7 @@ window.onload = function () {
   } );
 
   // Hook up the forgot password process to a button:
-  $( '#forgot-password' ).click( function ( evt ) {
+  $( '#forgot-password' ).click( function ( event ) {
 
     // Read in the input fields
     var email = $( '#email5' ).val();
@@ -238,17 +181,81 @@ window.onload = function () {
   // Attempt to load up a locally stored user identity and login with that:
   var loginPromise = Bridge.requestLoginStoredIdentity();
   if ( loginPromise === null ) {
-
     $( '#notify' ).prepend( timestamp( '<strong>No HTML5 stored user. Waiting for manual login...</strong>' ) );
-
   }
   else {
-
     $( '#notify' ).prepend( timestamp( '<strong>HTML5 stored user found. Logging in...</strong>' ) );
-
-    // Attach handlers to the login promise, if you like.
-    loginPromise.done( loginSuccessHandler ).fail( loginFailHandler );
-
+    loginPromise
+      .then( function ( data ) {
+        $( '#notify' ).prepend( timestamp( '<strong>requestLogin() successful!</strong>' ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isLoggedIn() result: ' + Bridge.isLoggedIn() ) );
+        $( '#notify' ).prepend( timestamp( 'HTML5 stored identity:' +
+          JSON.stringify( localStorage.getItem( 'bridge-client-identity' ) ) ) );
+      } )
+      .fail( function ( error ) {
+        if ( error.status === 0 ) {
+          $( '#notify' ).prepend( timestamp( '<strong>requestLogin() timed out!</strong>' ) );
+          $( '#notify' ).prepend( timestamp( 'Check your internet connection...' ) );
+        }
+        else {
+          $( '#notify' ).prepend( timestamp( '<strong>requestLogin() error!</strong>  ' + JSON.stringify( error ) ) );
+          $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
+        }
+      } );
   }
+
+
+  // ===============
+  // EVENT CALLBACKS
+  // ===============
+
+  // You can listen for the changePassword function being called:
+  Bridge.onChangePasswordCalled = function () {
+    $( '#notify' ).prepend( timestamp( '<strong>requestChangePassword() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
+  };
+
+  // You can listen for the forgotPassword function being called:
+  Bridge.onForgotPasswordCalled = function () {
+    $( '#notify' ).prepend( timestamp( '<strong>requestForgotPassword() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
+  };
+
+  // You can listen for the login function being called:
+  Bridge.onLoginCalled = function () {
+    $( '#notify' ).prepend( timestamp( '<strong>requestLogin() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
+  };
+
+  // You can listen for the logout() function being called:
+  Bridge.onLogoutCalled = function () {
+    $( '#notify' ).prepend( timestamp( '<strong>logout() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( 'Waiting for the logout operation to complete...' ) );
+  };
+
+  // You can listen for the recover password function being called:
+  Bridge.onRecoverPasswordCalled = function () {
+    $( '#notify' ).prepend( timestamp( '<strong>requestRecoverPassword() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
+  };
+
+  // You can listen for the register function being called:
+  Bridge.onRegisterCalled = function () {
+    $( '#notify' ).prepend( timestamp( '<strong>requestRegister() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
+  };
+
+  // You can listen for each request:
+  Bridge.onRequestCalled = function ( method, resource, payload ) {
+    $( '#notify' ).prepend( timestamp( 'Request >> ' + method + ' resource ' + resource +
+      ' = ' + JSON.stringify( payload ) ) );
+  };
+
+  // You can listen for the verify email function being called:
+  Bridge.onVerifyEmailCalled = function () {
+    $( '#notify' ).prepend( timestamp( '<strong>requestVerifyEmail() called!</strong>' ) );
+    $( '#notify' ).prepend( timestamp( 'Waiting for a response from the server...' ) );
+  };
 
 };

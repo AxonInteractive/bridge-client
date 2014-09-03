@@ -968,8 +968,10 @@ module.exports = function () {
 
     }
 
-    // No login request was sent, so return null.
-    return null;
+    // Return a rejected promise so we can handle failure uniformly as a promise.
+    var deferred = new Q.defer();
+    deferred.reject( { status: 403, message: 'No stored identity could be located to log in.' } );
+    return deferred.promise;
 
   };
 
