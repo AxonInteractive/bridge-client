@@ -37,7 +37,7 @@
       return {
         request: function ( config ) {
           if ( !config.headers.Bridge ) {
-            config.headers.Bridge = $bridge.createRequestHeader( {} );
+            config.headers.Bridge = $bridge.getBridge().createRequestHeader( {} );
           }
           return config;
         }
@@ -262,7 +262,7 @@
           // Bridge Server. If the status code we got back can't be classified as anything by 
           // isErrorCodeResponse(), a null error is returned and we can consider the response a
           // successful communication.
-          var error = $bridge.isErrorCodeResponse( response.status );
+          var error = $bridge.getIsErrorCodeResponse( response.status );
           if ( error !== null ) {
             deferred.reject( error );
           }
@@ -275,7 +275,7 @@
           // Server. If the status code we got back can't be classified as anything hy 
           // isErrorCodeResponse(), a null error is returned and the Bridge Client will handle the 
           // problem internally.
-          var error = $bridge.isErrorCodeResponse( response.status );
+          var error = $bridge.getIsErrorCodeResponse( response.status );
           deferred.reject( error );
         } );
 
