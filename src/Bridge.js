@@ -76,7 +76,7 @@ module.exports = function () {
 
     // Create a deferred object to provide a convenient way for the caller to handle success and 
     // failure.
-    var deferred = new Q.defer();
+    var deferred = Q.defer();
 
     // If a temporary identity was provided, use it (even if an identity is set in Bridge).
     var requestIdentity = null;
@@ -178,7 +178,7 @@ module.exports = function () {
     }
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new Q.defer();
+    var deferred = Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
     var onThen = function ( data ) {
@@ -264,7 +264,7 @@ module.exports = function () {
     }
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new Q.defer();
+    var deferred = Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
     var onThen = function ( data ) {
@@ -333,7 +333,7 @@ module.exports = function () {
     password = null;
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new Q.defer();
+    var deferred = Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
     var onThen = function ( data ) {
@@ -427,7 +427,7 @@ module.exports = function () {
     password = null;
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new Q.defer();
+    var deferred = Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
     var onThen = function ( data ) {
@@ -499,7 +499,7 @@ module.exports = function () {
     password = null;
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new Q.defer();
+    var deferred = Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
     var onThen = function ( data ) {
@@ -564,7 +564,7 @@ module.exports = function () {
     }
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new Q.defer();
+    var deferred = Q.defer();
 
     // Build our internal success handler (this calls deferred.resolve())
     var onThen = function ( data ) {
@@ -886,7 +886,7 @@ module.exports = function () {
   self.logout = function () {
 
     // Create a deferred object to return so the end-user can handle success/failure conveniently.
-    var deferred = new Q.defer();
+    var deferred = Q.defer();
 
     // Notify the user of the logout action.
     if ( typeof self.onLogoutCalled === 'function' ) {
@@ -955,6 +955,7 @@ module.exports = function () {
 
     // Check if an identity is in local storage to use for authentication.
     var storedIdentity = localStorage.getItem( 'bridge-client-identity' );
+
     if ( storedIdentity !== null ) {
 
       var parsedIdentity = JSON.parse( storedIdentity );
@@ -969,7 +970,7 @@ module.exports = function () {
     }
 
     // Return a rejected promise so we can handle failure uniformly as a promise.
-    var deferred = new Q.defer();
+    var deferred = Q.defer();
     deferred.reject( { status: 403, message: 'No stored identity could be located to log in.' } );
     return deferred.promise;
 
