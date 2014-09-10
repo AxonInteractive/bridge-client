@@ -20,8 +20,9 @@ window.onload = function () {
   // USAGE
   // =====
 
-  // Initialize your Bridge with the base URL of your API and a timeout (in milliseconds):
-  Bridge.init( 'https://localhost:3000/api/1.0/', 10000 );
+  // Initialize your Bridge with the base URL of your API:
+  Bridge.debug = true;
+  Bridge.baseUrl = 'https://localhost:3000/api/1.0/';
 
   // Hook up the registration process to a button:
   $( '#register' ).click( function ( evt ) {
@@ -37,7 +38,7 @@ window.onload = function () {
     Bridge.requestRegister( email, password, firstName, lastName, appData )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>requestRegister() successful!</strong>' ) );
-        // You could perform an immediate login after regsitration completes right here!
+        // You could perform an immediate login after registration completes right here!
       } )
       .fail( function ( error ) {
         if ( error.status === 0 ) {
@@ -48,7 +49,7 @@ window.onload = function () {
           $( '#notify' ).prepend( timestamp( '<strong>requestRegister() error!</strong>  ' + JSON.stringify( error ) ) );
           $( '#notify' ).prepend( timestamp( 'Registration request failed...' ) );
         }
-      } ); 
+      } );
 
   } );
 
