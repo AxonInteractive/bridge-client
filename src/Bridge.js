@@ -707,6 +707,17 @@ module.exports = function () {
   self.onVerifyEmailCalled = null;
 
 
+  //////////
+  // INIT //
+  //////////
+
+  // [PUBLIC] init()
+  // This function sets the Bridge Base API URL so that Bridge can communicate with the API.
+  self.init = function ( apiUrl ) {
+    self.baseUrl = apiUrl;
+  };
+
+
   ///////////////
   // FUNCTIONS //
   ///////////////
@@ -896,7 +907,7 @@ module.exports = function () {
     // Use the stored identity to authenticate if possible.
     var storedIdentity = localStorage.getItem( 'bridge-client-identity' );
     if ( storedIdentity !== null ) {
-      var parsedIdentity = JSON.parse( storedIdentity );
+      var parsedIdentity = JSON.parse( storedIdentity ).value;
       if ( self.debug === true ) {
         console.log( "Stored identity: " + JSON.stringify( parsedIdentity ) );
       }

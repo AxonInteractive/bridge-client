@@ -57,13 +57,21 @@
     }
   ] );
 
-  //////////////////////////////////////////////
-  // Force all Bridge requests through $http //
-  ////////////////////////////////////////////
+  ////////////////////////////////////////
+  // Create the Bridge Angular wrapper //
+  //////////////////////////////////////
 
   app.factory( '$bridge', [
 
     function () {
+
+      ///////////
+      // Init //
+      /////////
+
+      var init = function ( apiUrl ) {
+        Bridge.init( apiUrl );
+      };
 
       /////////////////
       // Properties //
@@ -200,6 +208,7 @@
       ////////////
 
       return {
+        init: init,
         getBridge: getBridge,
         getDebug: getDebug,
         setDebug: setDebug,
@@ -240,14 +249,14 @@
   ] );
 
   app.run( [
-    '$bridge', '$http',
-    function ( $bridge, $http ) {
+    '$bridge', '$http', '$q',
+    function ( $bridge, $http, $q ) {
 
       // Set $bridge.createRequest() so Bridge requests flow through $http
       $bridge.getBridge()
         .createRequest = function ( method, resource, signedHeader ) {
 
-          var deferred = Q.defer();
+          var deferred = $q.defer();
 
           // Use $http to send a request to the Bridge Server and return a Q promise that is
           // consistent with the Bridge Client promise signatures for reject() and resolve().
