@@ -66,13 +66,6 @@ module.exports = function authenticate( apiUrl, email, password, rememberMe ) {
         return;
       }
 
-      // Print a debug message to confirm that the authentication cookie is set.
-      if ( core.debug ) {
-        console.log( "Authorized: " + core.isAuthorized() );
-        console.log( "Auth Token: " + core.getAuthToken() );
-        console.log( "Auth Expiry: " + core.getAuthExpiry().toUTCString() );
-      }
-
       // If the response format is valid, resolve the request with the response data object.
       core.resolve( "Request", deferred, data );
 

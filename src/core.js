@@ -263,7 +263,9 @@ Q.longStackSupport = true;
    *
    */
   exports.request = function request( method, url, data ) {
-    exports.onRequestCalled( method, url, data );
+    if ( exports.onRequestCalled ) {
+      exports.onRequestCalled( method, url, data );
+    }
     var deferred = Q.defer(); // Creating 2 deferred objects here: 1 for this, 1 for sendRequest.
     exports.sendRequest( Q.defer(), method.toUpperCase(), url, data ).then(
 
