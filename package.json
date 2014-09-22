@@ -1,6 +1,6 @@
 {
   "name": "bridge-client",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The client-side application of Axon Bridge, a simple uniform interface for providing API services to browser-based applications.",
   "main": "bridge-client.js",
   "repository": {

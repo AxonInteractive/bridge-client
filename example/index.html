@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
-    
+
     <title>Bridge Testbed</title>
 
     <!-- Manually include jQuery, since it's huge and CDN-able. -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-    
+
     <!-- Include the main Axon Bridge client library. -->
     <script type="text/javascript" src="../lib/BridgeClient.js"></script>
-    
+
     <!-- The code we'll use to get started with Bridge. -->
     <script type="text/javascript" src="index.js"></script>
 
@@ -20,66 +20,85 @@
 
     <fieldset>
       <h2><legend>Registration</legend></h2>
-      <label for="email">Email: </label>
-      <input id="email" type="text" />
-      <label for="password">Password: </label>
-      <input id="password" type="password" />
-      <label for="first-name">First Name: </label>
-      <input id="first-name" type="text" />
-      <label for="last-name">Last Name: </label>
-      <input id="last-name" type="text" />
-      <label for="app-data">App Data: </label>
-      <textarea id="app-data" rows="2" cols="50">{}</textarea>
+      <label for="register-email">Email: </label>
+      <input id="register-email" type="text" />
+      <label for="register-password">Password: </label>
+      <input id="register-password" type="password" />
+      <label for="register-first-name">First Name: </label>
+      <input id="register-first-name" type="text" />
+      <label for="register-last-name">Last Name: </label>
+      <input id="register-last-name" type="text" />
+      <label for="register-app-data">App Data: </label>
+      <textarea id="register-app-data" rows="2" cols="50">{}</textarea>
       <button id="register" type="button">Register</button>
     </fieldset>
 
     <fieldset>
       <h2><legend>Verify Email</legend></h2>
-      <label for="hash">Hash: </label>
-      <input id="hash" type="text" />
+      <label for="verify-email-hash">Hash: </label>
+      <input id="verify-email-hash" type="text" />
       <button id="verify-email" type="button">Verify Email</button>
     </fieldset>
 
     <fieldset>
+      <h2><legend>Authenticate</legend></h2>
+      <label for="authenticate-email">Email: </label>
+      <input id="authenticate-email" type="text" />
+      <label for="authenticate-password">Password: </label>
+      <input id="authenticate-password" type="password" />
+      <label for="authenticate-remember-me">Remember Me: </label>
+      <input id="authenticate-remember-me" type="checkbox" />
+      <button id="authenticate" type="button">Authenticate</button>
+    </fieldset>
+
+    <fieldset>
       <h2><legend>Login</legend></h2>
-      <label for="email2">Email: </label>
-      <input id="email2" type="text" />
-      <label for="password2">Password: </label>
-      <input id="password2" type="password" />
-      <label for="use-local-storage">Use Local Storage: </label>
-      <input id="use-local-storage" type="checkbox" />
+      <label for="login-email">Email: </label>
+      <input id="login-email" type="text" />
+      <label for="login-password">Password: </label>
+      <input id="login-password" type="password" />
+      <label for="login-remember-me">Remember Me: </label>
+      <input id="login-remember-me" type="checkbox" />
       <button id="login" type="button">Login</button>
     </fieldset>
 
     <fieldset>
-      <h2><legend>Change Password</legend></h2>
-      <label for="old-password">Old Password: </label>
-      <input id="old-password" type="password" />
-      <label for="new-password">New Password: </label>
-      <input id="new-password" type="password" />
-      <button id="change-password" type="button">Change Password</button>
+      <h2><legend>Update User Profile</legend></h2>
+      <label for="update-user-profile-email">Email: </label>
+      <input id="update-user-profile-email" type="text" />
+      <label for="update-user-profile-old-password">Current Password: </label>
+      <input id="update-user-profile-old-password" type="password" />
+      <label for="update-user-profile-new-password">New Password: </label>
+      <input id="update-user-profile-new-password" type="password" />
+      <label for="update-user-profile-first-name">First Name: </label>
+      <input id="update-user-profile-first-name" type="text" />
+      <label for="update-user-profile-last-name">Last Name: </label>
+      <input id="update-user-profile-last-name" type="text" />
+      <label for="update-user-profile-app-data">App Data: </label>
+      <textarea id="update-user-profile-app-data" rows="2" cols="50">{}</textarea>
+      <button id="update-user-profile" type="button">Update User Profile</button>
     </fieldset>
 
     <fieldset>
       <h2><legend>Forgot Password</legend></h2>
-      <label for="email5">Email: </label>
-      <input id="email5" type="text" />
+      <label for="forgot-password-email">Email: </label>
+      <input id="forgot-password-email" type="text" />
       <button id="forgot-password" type="button">Request Password Recovery Email</button>
     </fieldset>
 
     <fieldset>
       <h2><legend>Recover Password</legend></h2>
-      <label for="hash2">Hash: </label>
-      <input id="hash2" type="text" />
-      <label for="new-password2">New Password (Hash): </label>
-      <input id="new-password2" type="password" />
+      <label for="recover-password-hash">Hash: </label>
+      <input id="recover-password-hash" type="text" />
+      <label for="recover-password-new-password">New Password: </label>
+      <input id="recover-password-new-password" type="password" />
       <button id="recover-password" type="button">Recover Password</button>
     </fieldset>
 
     <fieldset>
       <h2><legend>Utilities</legend></h2>
+      <button id="get-user-profile" type="button">Get User Profile</button>
       <button id="logout" type="button">Logout</button>
-      <button id="clear-local-storage" type="button">Clear HTML5 Local Storage</button>
     </fieldset>
 
     <div id="notify">

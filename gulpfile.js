@@ -19,7 +19,7 @@
 
   // Concat scripts using Browserify to manage dependencies
   gulp.task( 'coreDev', function () {
-    return browserify( './src/index.js' )
+    return browserify( './src/BridgeClient.js' )
       .bundle( {
         'standalone': 'Bridge',
         'debug': true
@@ -30,7 +30,7 @@
 
   // Concat scripts using Browserify to manage dependencies
   gulp.task( 'coreDist', function () {
-    return browserify( './src/index.js' )
+    return browserify( './src/BridgeClient.js' )
       .bundle( {
         'standalone': 'Bridge',
         'debug': false
@@ -42,7 +42,10 @@
 
   // Copy the plugins into the lib folder
   gulp.task( 'plugins', function () {
-    return gulp.src( './src/plugins/*' )
+    return gulp.src( [
+        './src/plugins/*',
+        '!./src/plugins/Default.js'
+      ] )
       .pipe( gulp.dest( './lib/plugins' ) );
   } );
 
