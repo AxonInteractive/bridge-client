@@ -263,10 +263,15 @@ Q.longStackSupport = true;
    *
    */
   exports.request = function request( method, url, data ) {
+
+    // Call the onRequestCalled callback, if one is registered.
     if ( exports.onRequestCalled ) {
       exports.onRequestCalled( method, url, data );
     }
-    var deferred = Q.defer(); // Creating 2 deferred objects here: 1 for this, 1 for sendRequest.
+
+    // Call sendRequest() to handle the XHR in whatever way it has been configured to.
+    // Note: Creating 2 deferred objects here: 1 for this, 1 for sendRequest.
+    var deferred = Q.defer();
     exports.sendRequest( Q.defer(), method.toUpperCase(), url, data ).then(
 
       // Request was resolved /////////////////////////////////////////////////////////////////////
@@ -295,7 +300,9 @@ Q.longStackSupport = true;
       /////////////////////////////////////////////////////////////////////////////////////////////
 
     );
+
     return deferred.promise;
+
   };
 
 } )();

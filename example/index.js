@@ -8,7 +8,7 @@ window.onload = function () {
   // Setup ////////////////////////////////////////////////////////////////////////////////////////
   // Specify the debug mode and your API's base URL (for your own convenience)
   Bridge.debug = true;
-  var apiUrl = 'https://192.168.2.34/peir/api/1.0/';
+  var apiUrl = 'https://192.168.2.34/peir/api/1.0';
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Just a convenience to dump text to the DOM for this demo:
@@ -68,7 +68,7 @@ window.onload = function () {
     // Read in the input fields
     var email = $( '#authenticate-email' ).val();
     var password = $( '#authenticate-password' ).val();
-    var rememberMe = $( '#authenticate-use-local-storage' ).prop( 'checked' );
+    var rememberMe = $( '#authenticate-remember-me' ).prop( 'checked' );
 
     // Send an authenticate request using Bridge.
     Bridge.authenticate( apiUrl, email, password, rememberMe )
