@@ -47,7 +47,7 @@ module.exports = function recoverPassword( apiUrl, password, hash ) {
 
       // Validate the structure of the response, and if invalid, reject the request with a
       // new error object indicating that the response is malformed.
-      if ( !data.content || !( data.content.message instanceof String ) ) {
+      if ( !data.content || typeof( data.content.message ) !== 'string' ) {
         core.reject( "Recover Password", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
         return;
       }

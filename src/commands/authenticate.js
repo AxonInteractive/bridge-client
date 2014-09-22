@@ -61,13 +61,13 @@ module.exports = function authenticate( apiUrl, email, password, rememberMe ) {
 
       // Validate the structure of the response, and if invalid, reject the request with a
       // new error object indicating that the response is malformed.
-      if ( !data.content.message || !( data.content.message instanceof String ) ) {
+      if ( !data.content.message || typeof( data.content.message ) !== 'string' ) {
         core.reject( "Authenticate", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
         return;
       }
 
       // If the response format is valid, resolve the request with the response data object.
-      core.resolve( "Request", deferred, data );
+      core.resolve( "Authenticate", deferred, data );
 
     },
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ module.exports = function authenticate( apiUrl, email, password, rememberMe ) {
       core.logout();
 
       // If the response failed, reject the request with the error object passed up from below.
-      core.reject( "Request", deferred, error );
+      core.reject( "Authenticate", deferred, error );
 
     }
     /////////////////////////////////////////////////////////////////////////////////////////////
