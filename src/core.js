@@ -193,7 +193,7 @@ Q.longStackSupport = true;
 
   /**
    *
-   * @private
+   * @public
    *
    * @function     resolve
    *
@@ -208,7 +208,7 @@ Q.longStackSupport = true;
    * @return {undefined}
    *
    */
-  var resolve = function resolve( name, deferred, data ) {
+  exports.resolve = function resolve( name, deferred, data ) {
     if ( exports.debug === true ) {
       console.log( "BRIDGE | " + name + " | " + JSON.stringify( data ) );
     }
@@ -217,7 +217,7 @@ Q.longStackSupport = true;
 
   /**
    *
-   * @private
+   * @public
    *
    * @function     reject
    *
@@ -232,7 +232,7 @@ Q.longStackSupport = true;
    * @return {undefined}
    *
    */
-  var reject = function reject( name, deferred, data ) {
+  exports.reject = function reject( name, deferred, data ) {
     if ( exports.debug === true ) {
       console.error( "BRIDGE | " + name + " | " + data.status + " >> Code " + data.errorCode +
         ": " + errors.getExplanation( data.errorCode ) );
@@ -280,12 +280,12 @@ Q.longStackSupport = true;
         // Validate the top-level structure of the response format, and if invalid, reject the
         // request with a new error object indicating that the response is malformed.
         if ( !data.content || !( data.content instanceof Object ) ) {
-          reject( "Request", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
+          exports.reject( "Request", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
           return;
         }
 
         // If the response format is valid, resolve the request with the response data object.
-        resolve( "Request", deferred, data );
+        exports.resolve( "Request", deferred, data );
 
       },
       /////////////////////////////////////////////////////////////////////////////////////////////
@@ -294,7 +294,7 @@ Q.longStackSupport = true;
       function ( error ) {
 
         // If the response failed, reject the request with the error object passed up from below.
-        reject( "Request", deferred, error );
+        exports.reject( "Request", deferred, error );
 
       }
       /////////////////////////////////////////////////////////////////////////////////////////////
