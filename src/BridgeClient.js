@@ -1,5 +1,7 @@
 ( function () {
 
+  'use strict';
+
   // Import Bridge core functionality
   var core = require( './core' );
   var errors = require( './errors' );
