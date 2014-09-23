@@ -10,12 +10,12 @@
   var authenticate      = require( './commands/authenticate' );
   var deauthenticate    = require( './commands/deauthenticate' );
   var forgotPassword    = require( './commands/forgotPassword' );
-  var getUserProfile    = require( './commands/getUserProfile' );
+  var loadUser          = require( './commands/loadUser' );
   var login             = require( './commands/login' );
   var logout            = require( './commands/logout' );
   var recoverPassword   = require( './commands/recoverPassword' );
   var register          = require( './commands/register' );
-  var updateUserProfile = require( './commands/updateUserProfile' );
+  var saveUser          = require( './commands/saveUser' );
   var verifyEmail       = require( './commands/verifyEmail' );
 
   /**
@@ -75,6 +75,10 @@
    *                                          be sent to the given email address. recoverPassword()
    *                                          represents the completion of the recovery process.
    *
+   * @property {Function} loadUser            Makes an API call to fetch an up-to-date copy of the
+   *                                          user's profile. If this request is successful, the
+   *                                          user object will be overwritten with a fresh copy.
+   *
    * @property {Function} login               A convenience function that first authenticates the
    *                                          user and then goes on to fetch their user profile, if
    *                                          successful.
@@ -103,11 +107,7 @@
    *                                          success and failure of your request, whatever it may
    *                                          be.
    *
-   * @property {Function} getUserProfile      Makes an API call to fetch an up-to-date copy of the
-   *                                          user's profile. If this request is successful, the
-   *                                          user object will be overwritten with a fresh copy.
-   *
-   * @property {Function} updateUserProfile   Makes an API call to submit the current user object to
+   * @property {Function} saveUser            Makes an API call to submit the current user object to
    *                                          the database as the up-to-date copy. If successful,
    *                                          the user's profile in the database will be updated.
    *
@@ -163,13 +163,13 @@
     authenticate        : authenticate,
     deauthenticate      : deauthenticate,
     forgotPassword      : forgotPassword,
+    loadUser            : loadUser,
     login               : login,
     logout              : logout,
     recoverPassword     : recoverPassword,
     register            : register,
     request             : core.request,
-    getUserProfile      : getUserProfile,
-    updateUserProfile   : updateUserProfile,
+    saveUser            : saveUser,
     verifyEmail         : verifyEmail,
 
     // XHR Interface

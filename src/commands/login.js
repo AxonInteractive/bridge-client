@@ -6,13 +6,13 @@ var Q = require( '../include/q' );
 var core = require( '../core' );
 var errors = require( '../errors' );
 var authenticate = require( '../commands/authenticate' );
-var getUserProfile = require( '../commands/getUserProfile' );
+var loadUser = require( '../commands/loadUser' );
 
 /**
  *
  * @public
  *
- * @function      login [authenticate >> getUserProfile]
+ * @function      login [authenticate >> loadUser]
  *
  * @description   Ask the server to authenticate the user given their email and password, and
  *                follow the authentication (if successful) with a request for the user's profile.
@@ -47,7 +47,7 @@ module.exports = function login( apiUrl, email, password, rememberMe ) {
     function ( data ) {
 
       // If authentication was successful, send a request to fetch the user's profile.
-      getUserProfile( apiUrl, email ).then(
+      loadUser( apiUrl, email ).then(
         function ( data ) {
 
           // If fetching the user profile is successful, resolve the request with the response data.

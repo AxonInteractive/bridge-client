@@ -12,12 +12,11 @@ var errors = require( '../errors' );
  *
  * @public
  *
- * @function      getUserProfile [POST]
+ * @function      loadUser [GET]
  *
- * @description   Ask the server to change the password of the currently logged-in user. This
- *                operation requires the user's current password to be supplied to re-authenticate
- *                the user to verify that another individual didn't just hop onto a logged-in
- *                computer and change a user's password while they were away from their computer.
+ * @description   Ask the server to fetch the current copy of the currently logged-in user's profile
+ *                from the database and set it as Bridge's user profile object. This WILL overwrite
+ *                any unsaved changes to the existing user profile object.
  *
  * @param         {String} apiUrl       The base URL of the API to send this request to. It doesn't
  *                                      matter whether the trailing forward-slash is left on or not
@@ -26,7 +25,7 @@ var errors = require( '../errors' );
  * @returns       {Promise}             A q.js promise object.
  *
  */
-module.exports = function getUserProfile( apiUrl ) {
+module.exports = function loadUser( apiUrl ) {
 
   'use strict';
 
@@ -43,7 +42,7 @@ module.exports = function getUserProfile( apiUrl ) {
       // Validate the structure of the response, and if invalid, reject the request with a
       // new error object indicating that the response is malformed.
       if ( !( data.content instanceof Object ) ) {
-        core.reject( "Get User Profile", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
+        core.reject( "Load User", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
         return;
       }
 
@@ -53,7 +52,7 @@ module.exports = function getUserProfile( apiUrl ) {
       core.unchangedUser = JSON.stringify( data.content );
 
       // If the response format is valid, resolve the request with the response data object.
-      core.resolve( "Get User Profile", deferred, data );
+      core.resolve( "Load User", deferred, data );
 
     },
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +61,7 @@ module.exports = function getUserProfile( apiUrl ) {
     function ( error ) {
 
       // If the response failed, reject the request with the error object passed up from below.
-      core.reject( "Get User Profile", deferred, error );
+      core.reject( "Load User", deferred, error );
 
     }
     /////////////////////////////////////////////////////////////////////////////////////////////

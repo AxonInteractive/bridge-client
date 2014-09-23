@@ -13,12 +13,11 @@ var authenticate = require( '../commands/authenticate' );
  *
  * @public
  *
- * @function      updateUserProfile [PUT user]
+ * @function      saveUser [PUT]
  *
- * @description   Ask the server to update the user profile of the currently logged-in user. This
- *                operation requires the user's current password to be supplied to re-authenticate
- *                the user to verify that another individual didn't just hop onto a logged-in
- *                computer and change a user's password while they were away from their computer.
+ * @description   Ask the server to save the user profile of the currently logged-in user to the
+ *                API server's database. This operation requires the user's current password to be
+ *                supplied to re-authenticate the user if they intend to change their password.
  *
  * @param         {String} apiUrl           The base URL of the API to send this request to. It
  *                                          doesn't matter whether the trailing forward-slash is
@@ -34,7 +33,7 @@ var authenticate = require( '../commands/authenticate' );
  * @returns       {Promise}                 A q.js promise object.
  *
  */
-module.exports = function updateUserProfile( apiUrl, currentPassword, newPassword ) {
+module.exports = function saveUser( apiUrl, currentPassword, newPassword ) {
 
   'use strict';
 
@@ -42,7 +41,7 @@ module.exports = function updateUserProfile( apiUrl, currentPassword, newPasswor
   // If it isn't, reject the request with a new error object indicating that no user object is set.
   var deferred = Q.defer();
   if ( !core.user ) {
-    core.reject( "Update User Profile", deferred, new errors.BridgeError( errors.NO_USER_PROFILE ) );
+    core.reject( "Save User", deferred, new errors.BridgeError( errors.NO_USER_PROFILE ) );
     return;
   }
 
@@ -63,20 +62,20 @@ module.exports = function updateUserProfile( apiUrl, currentPassword, newPasswor
       // Validate the structure of the response, and if invalid, reject the request with a
       // new error object indicating that the response is malformed.
       if ( typeof( data.content ) !== 'string' ) {
-        core.reject( "Update User Profile", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
+        core.reject( "Save User", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
         return;
       }
 
       // If updating the user profile is successful, update the unchanged user to match and
       // resolve the request with the response data.
       core.unchangedUser = JSON.stringify( core.user );
-      core.resolve( "Update User Profile", deferred, data );
+      core.resolve( "Save User", deferred, data );
 
     },
     function ( error ) {
 
       // If updating the user profile failed, reject the request with the error object.
-      core.reject( "Update User Profile", deferred, error );
+      core.reject( "Save User", deferred, error );
 
     }
   );
