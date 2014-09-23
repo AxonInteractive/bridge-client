@@ -42,7 +42,7 @@ module.exports = function getUserProfile( apiUrl ) {
 
       // Validate the structure of the response, and if invalid, reject the request with a
       // new error object indicating that the response is malformed.
-      if ( !data.content || !( data.content instanceof Object ) ) {
+      if ( !( data.content instanceof Object ) ) {
         core.reject( "Get User Profile", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
         return;
       }

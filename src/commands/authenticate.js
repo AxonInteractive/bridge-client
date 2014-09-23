@@ -58,7 +58,7 @@ module.exports = function authenticate( apiUrl, email, password, rememberMe ) {
 
       // Validate the structure of the response, and if invalid, reject the request with a
       // new error object indicating that the response is malformed.
-      if ( !data.content.message || typeof( data.content.message ) !== 'string' ) {
+      if ( typeof( data.content ) !== 'string' ) {
         core.reject( "Authenticate", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
         return;
       }

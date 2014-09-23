@@ -44,7 +44,7 @@ module.exports = function verifyEmail( apiUrl, hash ) {
 
       // Validate the structure of the response, and if invalid, reject the request with a
       // new error object indicating that the response is malformed.
-      if ( !data.content || typeof( data.content.message ) !== 'string' ) {
+      if ( typeof( data.content ) !== 'string' ) {
         core.reject( "Verify Email", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
         return;
       }
