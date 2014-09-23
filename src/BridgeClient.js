@@ -164,7 +164,7 @@
     deauthenticate      : deauthenticate,
     forgotPassword      : forgotPassword,
     login               : login,
-    logout              : core.logout,
+    logout              : logout,
     recoverPassword     : recoverPassword,
     register            : register,
     request             : core.request,
