@@ -254,13 +254,6 @@ Q.longStackSupport = true;
       // Request was resolved /////////////////////////////////////////////////////////////////////
       function ( data ) {
 
-        // Validate the top-level structure of the response format, and if invalid, reject the
-        // request with a new error object indicating that the response is malformed.
-        if ( !data.content || !( data.content instanceof Object ) ) {
-          exports.reject( "Request", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
-          return;
-        }
-
         // If the response format is valid, resolve the request with the response data object.
         exports.resolve( "Request", deferred, data );
 
