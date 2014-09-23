@@ -12,6 +12,7 @@
   var forgotPassword    = require( './commands/forgotPassword' );
   var getUserProfile    = require( './commands/getUserProfile' );
   var login             = require( './commands/login' );
+  var logout            = require( './commands/logout' );
   var recoverPassword   = require( './commands/recoverPassword' );
   var register          = require( './commands/register' );
   var updateUserProfile = require( './commands/updateUserProfile' );
@@ -36,6 +37,15 @@
    * @property {Function} getIsAuthenticated  This function returns whether or not the current
    *                                          session has been authenticated by the API server.
    *
+   * @property {Function} getIsUserLoggedIn   Checks to see if the session is authenticated and that
+   *                                          the user profile object is set. Both both are true,
+   *                                          the user is considered to be logged in.
+   *
+   * @property {Function} getIsUserModified   Checks to see if the user object has been changed
+   *                                          since the last time that getUserProfile() was called
+   *                                          to get a fresh copy. This is helpful warn users that
+   *                                          there are changes that must be saved.
+   *
    * @property {Function} getRememberMe       This function returns the current "remember me" state
    *                                          of the application.
    *
@@ -44,14 +54,22 @@
    *                                          API with getUserProfile() and updated on the API using
    *                                          updateUserProfile().
    *
+   * @property {Function} onRequestCalled     A callback function that allows you to attach special
+   *                                          behaviour to every request call made by Bridge. This
+   *                                          callback captures the HTTP method, URL, and the
+   *                                          payload of each outgoing request before it is sent and
+   *                                          gives you the opportunity to modify requests, if
+   *                                          necessary.
+   *
    * @property {Function} authenticate        Makes an API call to request authentication. If the
    *                                          request is successful, a Bridge authentication cookie
    *                                          is set in the browser to identify the user from now
    *                                          on.
    *
-   * @property {Function} getAuthToken        Gets the value of the Bridge authentication token from
-   *                                          the browser's cookie store. If the authentication
-   *                                          cookie is not set, this returns an empty string.
+   * @property {Function} deauthenticate      Makes an API call to request deauthentication. If the
+   *                                          request is successful, the Bridge authentication
+   *                                          cookie is set to expire immediately, and all session
+   *                                          variables in Bridge are reset.
    *
    * @property {Function} forgotPassword      Makes an API call to request a password recovery email
    *                                          be sent to the given email address. recoverPassword()
@@ -61,9 +79,8 @@
    *                                          user and then goes on to fetch their user profile, if
    *                                          successful.
    *
-   * @property {Function} logout              Clears the Bridge authentication cookie from the
-   *                                          browser cookie store so the user is no longer
-   *                                          authenticated.
+   * @property {Function} logout              An alias for deauthenticate(). It does exactly the
+   *                                          same thing.
    *
    * @property {Function} recoverPassword     Makes an API call to complete the password recovery
    *                                          process started by calling forgotPassword(). The user
@@ -86,27 +103,6 @@
    *                                          success and failure of your request, whatever it may
    *                                          be.
    *
-   * @property {Function} onRequestCalled     A callback function that allows you to attach special
-   *                                          behaviour to every request call made by Bridge. This
-   *                                          callback captures the HTTP method, URL, and the
-   *                                          payload of each outgoing request before it is sent and
-   *                                          gives you the opportunity to modify requests, if
-   *                                          necessary.
-   *
-   * @property {Function} sendRequest         This function is the lowest-level implementation of
-   *                                          XHR behaviour within Bridge. By default, it is
-   *                                          configured to use the XmlHttpRequest object in JS to
-   *                                          send requests, but can be overridden by another
-   *                                          function of your own creation, as long as it is of the
-   *                                          same signature. This is useful if you want to make a
-   *                                          plugin for Bridge to interface with another library or
-   *                                          framework such as AngularJS.
-   *
-   * @property {Function} isUserModified      Checks to see if the user object has been changed
-   *                                          since the last time that getUserProfile() was called
-   *                                          to get a fresh copy. This is helpful warn users that
-   *                                          there are changes that must be saved.
-   *
    * @property {Function} getUserProfile      Makes an API call to fetch an up-to-date copy of the
    *                                          user's profile. If this request is successful, the
    *                                          user object will be overwritten with a fresh copy.
@@ -121,6 +117,15 @@
    *                                          order to verify their email address and authorize the
    *                                          activation of their account (if the Bridge Server has
    *                                          email verification enabled).
+   *
+   * @property {Function} sendRequest         This function is the lowest-level implementation of
+   *                                          XHR behaviour within Bridge. By default, it is
+   *                                          configured to use the XmlHttpRequest object in JS to
+   *                                          send requests, but can be overridden by another
+   *                                          function of your own creation, as long as it is of the
+   *                                          same signature. This is useful if you want to make a
+   *                                          plugin for Bridge to interface with another library or
+   *                                          framework such as AngularJS.
    *
    */
   module.exports = {
