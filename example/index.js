@@ -107,18 +107,18 @@ window.onload = function () {
 
   } );
 
-  $( '#update-user-profile' ).click( function ( event ) {
+  $( '#save-user' ).click( function ( event ) {
 
     // Read in the input fields
-    var email = $( '#update-user-profile-email' ).val();
-    var currentPassword = $( '#update-user-profile-old-password' ).val();
-    var newPassword = $( '#update-user-profile-new-password' ).val();
-    var firstName = $( '#update-user-profile-first-name' ).val();
-    var lastName = $( '#update-user-profile-last-name' ).val();
-    var appData = JSON.parse( $( '#update-user-profile-app-data' ).val() );
+    var email = $( '#save-user-email' ).val();
+    var currentPassword = $( '#save-user-old-password' ).val();
+    var newPassword = $( '#save-user-new-password' ).val();
+    var firstName = $( '#save-user-first-name' ).val();
+    var lastName = $( '#save-user-last-name' ).val();
+    var appData = JSON.parse( $( '#save-user-app-data' ).val() );
 
     // Send a change password request using Bridge.
-    Bridge.updateUserProfile( apiUrl, currentPassword, newPassword )
+    Bridge.saveUser( apiUrl, currentPassword, newPassword )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>User Profile Update successful!</strong>' ) );
       } )
@@ -169,10 +169,10 @@ window.onload = function () {
 
   } );
 
-  $( '#get-user-profile' ).click( function ( event ) {
+  $( 'load-user' ).click( function ( event ) {
 
     // Send a recover password request using Bridge.
-    Bridge.getUserProfile( apiUrl )
+    Bridge.loadUser( apiUrl )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>User Profile Fetch successful!</strong>' ) );
         $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
