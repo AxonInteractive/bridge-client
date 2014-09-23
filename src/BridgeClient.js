@@ -8,6 +8,7 @@
 
   // Import Bridge API commands
   var authenticate      = require( './commands/authenticate' );
+  var deauthenticate    = require( './commands/deauthenticate' );
   var forgotPassword    = require( './commands/forgotPassword' );
   var getUserProfile    = require( './commands/getUserProfile' );
   var login             = require( './commands/login' );
@@ -24,27 +25,29 @@
    *
    * @type          {Object}
    *
-   * @property {Function} debug               This function can either get or set the debug mode of
-   *                                          Bridge. When called with no arguments, it returns the
-   *                                          current debug mode. When called with a single Boolean
-   *                                          argument, it sets the debug mode.
+   * @property {Function} getDebug            This function returns the debug mode of Bridge.
    *
-   * @property {User} user                    The user profile object that you should use in your
-   *                                          app that get be fetched from the API with
-   *                                          getUserProfile() and updated on the API using
+   * @property {Function} setDebug            This function sets the debug mode of Bridge.
+   *
+   * @property {Function} getErrors           This function returns the errors module from which all
+   *                                          of the error types that Bridge uses to enumerate
+   *                                          failures are visible.
+   *
+   * @property {Function} getIsAuthenticated  This function returns whether or not the current
+   *                                          session has been authenticated by the API server.
+   *
+   * @property {Function} getRememberMe       This function returns the current "remember me" state
+   *                                          of the application.
+   *
+   * @property {Function} getUser             This function returns the user profile object that you
+   *                                          should use in your app that get be fetched from the
+   *                                          API with getUserProfile() and updated on the API using
    *                                          updateUserProfile().
-   *
-   * @property {Errors} errors                The errors module from which all of the error types
-   *                                          that Bridge uses to enumerate failures are visible.
    *
    * @property {Function} authenticate        Makes an API call to request authentication. If the
    *                                          request is successful, a Bridge authentication cookie
    *                                          is set in the browser to identify the user from now
    *                                          on.
-   *
-   * @property {Function} isAuthenticated     Checks to see if a Bridge authentication cookie is
-   *                                          set. If so, the user is considered to be
-   *                                          authenticated.
    *
    * @property {Function} getAuthToken        Gets the value of the Bridge authentication token from
    *                                          the browser's cookie store. If the authentication
@@ -121,32 +124,52 @@
    *
    */
   module.exports = {
-    debug             : function ( value ) {
-                          if ( value ) {
-                            core.debug = value;
-                          }
-                          else {
+
+    // Getters/Setters for Properties
+    getDebug            : function () {
                             return core.debug;
-                          }
-                        },
-    user              : core.user,
-    errors            : errors,
-    authenticate      : authenticate,
-    isAuthenticated   : core.isAuthenticated,
-    getAuthToken      : core.getAuthToken,
-    forgotPassword    : forgotPassword,
-    login             : login,
-    logout            : core.logout,
-    recoverPassword   : recoverPassword,
-    register          : register,
-    onRequestCalled   : core.onRequestCalled,
-    request           : core.request,
-    sendRequest       : core.sendRequest,
-    isUserLoggedIn    : core.isUserLoggedIn,
-    isUserModified    : core.isUserModified,
-    getUserProfile    : getUserProfile,
-    updateUserProfile : updateUserProfile,
-    verifyEmail       : verifyEmail
+                          },
+    setDebug            : function ( value ) {
+                            core.debug = value;
+                          },
+    getErrors           : function () {
+                            return errors;
+                          },
+    getIsAuthenticated  : function () {
+                            return core.isAuthenticated;
+                          },
+    getIsUserLoggedIn   : function () {
+                            return core.isUserLoggedIn;
+                          },
+    getIsUserModified   : function () {
+                            return core.isUserModified;
+                          },
+    getRememberMe       : function () {
+                            return core.rememberMe;
+                          },
+    getUser             : function () {
+                            return core.user;
+                          },
+
+    // Callbacks
+    onRequestCalled     : core.onRequestCalled,
+
+    // Commands
+    authenticate        : authenticate,
+    deauthenticate      : deauthenticate,
+    forgotPassword      : forgotPassword,
+    login               : login,
+    logout              : core.logout,
+    recoverPassword     : recoverPassword,
+    register            : register,
+    request             : core.request,
+    getUserProfile      : getUserProfile,
+    updateUserProfile   : updateUserProfile,
+    verifyEmail         : verifyEmail,
+
+    // XHR Interface
+    sendRequest         : core.sendRequest
+
   };
 
 } )();

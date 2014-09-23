@@ -14,10 +14,11 @@ var errors = require( '../errors' );
  *
  * @function      authenticate [POST]
  *
- * @description   Ask the server to change the password of the currently logged-in user. This
- *                operation requires the user's current password to be supplied to re-authenticate
- *                the user to verify that another individual didn't just hop onto a logged-in
- *                computer and change a user's password while they were away from their computer.
+ * @description   Ask the server to validate the current session by sending an authorization cookie
+ *                that will identify the authenticated user. The cookie received from the server
+ *                will operate under the same domain policy and the "HttpOnly" restriction to
+ *                prevent XSS attacks from stealing user authentication tokens and masquerading as
+ *                authenticated users.
  *
  * @param         {String} apiUrl       The base URL of the API to send this request to. It doesn't
  *                                      matter whether the trailing forward-slash is left on or not
@@ -28,12 +29,11 @@ var errors = require( '../errors' );
  * @param         {String} password     The user's password (not hashed yet).
  *
  * @param         {Boolean} rememberMe  A boolean indicating whether or not the user would like to
- *                                      have a long expiry date or not. If this is true, then the
- *                                      Bridge server will return an auth token with an expiry
- *                                      on the order of 2 weeks from the user's last request (but
- *                                      can be modified in the server settings). If false, the
- *                                      expiry will only be about 1 hour from the last request
- *                                      (again, this is configurable).
+ *                                      be automatically logged-in in the future. If rememberMe is
+ *                                      set to false, the authentication cookie sent by the server
+ *                                      will expire when the current browser session ends. If this
+ *                                      is set to true, it will expire after a period of time
+ *                                      defined by the Bridge server config file (default 2 weeks).
  *
  * @returns       {Promise}             A q.js promise object.
  *
@@ -41,9 +41,6 @@ var errors = require( '../errors' );
 module.exports = function authenticate( apiUrl, email, password, rememberMe ) {
 
   'use strict';
-
-  // Set the remember me flag
-  core.rememberMe = rememberMe;
 
   // Build the request payload (hash the password with SHA256).
   var payload = {
@@ -66,6 +63,10 @@ module.exports = function authenticate( apiUrl, email, password, rememberMe ) {
         return;
       }
 
+      // Set the session as being authenticated and store the "remember me" state.
+      core.isAuthenticated = true;
+      core.rememberMe = rememberMe;
+
       // If the response format is valid, resolve the request with the response data object.
       core.resolve( "Authenticate", deferred, data );
 
@@ -74,9 +75,6 @@ module.exports = function authenticate( apiUrl, email, password, rememberMe ) {
 
     // Request was rejected /////////////////////////////////////////////////////////////////////
     function ( error ) {
-
-      // Clear any existing auth cookie if one was set.
-      core.logout();
 
       // If the response failed, reject the request with the error object passed up from below.
       core.reject( "Authenticate", deferred, error );

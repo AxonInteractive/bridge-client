@@ -33,9 +33,16 @@ Q.longStackSupport = true;
 
   /**
    * @public
-   * @property {User}  user  The user profile object that is modifiable by users of Bridge.
+   * @property {Boolean}  isAuthenticated  Whether or not the current session has been
+   *                                       authenticated by the API server.
    */
-  exports.user = null;
+  exports.isAuthenticated = false;
+
+  /**
+   * @public
+   * @property {Boolean}  rememberMe  Whether or not the user selected the remember me option.
+   */
+  exports.rememberMe = false;
 
   /**
    * @public
@@ -46,67 +53,13 @@ Q.longStackSupport = true;
 
   /**
    * @public
-   * @property {Boolean}  rememberMe  Whether or not the user selected the remember me option.
+   * @property {User}  user  The user profile object that is modifiable by users of Bridge.
    */
-  exports.rememberMe = false;
+  exports.user = null;
 
   ///////////////////////
   // Helper Functions //
   /////////////////////
-
-  /**
-   *
-   * @public
-   *
-   * @function      isAuthenticated
-   *
-   * @description   Returns whether or not an existing Bridge authentication cookie is set.
-   *
-   * @returns       {Boolean} Whether or not the Bridge authentication cookie cookie is set.
-   *
-   */
-  exports.isAuthenticated = function isAuthenticated () {
-    return ( exports.getAuthToken().length > 0 );
-  };
-
-  /**
-   *
-   * @public
-   *
-   * @function      getAuthToken
-   *
-   * @description   Returns the JWT token used by the Bridge authentication cookie.
-   *
-   * @returns       {String} The JWT token used by the Bridge authentication cookie.
-   *
-   */
-  exports.getAuthToken = function getAuthToken () {
-    var regex = new RegExp( AUTH_COOKIE_NAME + '=.*?;' );
-    var matches = regex.exec( document.cookie );
-    return ( matches ) ? matches[ 0 ].substring( 12, matches[ 0 ].length - 1 ) : '';
-  };
-
-  /**
-   *
-   * @public
-   *
-   * @function      logout
-   *
-   * @description   Set the cookie to by clearing the token string and setting its expiry for Y2K so
-   *                the server rejects any further requests made with this cookie and there's no
-   *                sensitive information to decrypt from it. This function also clears the user
-   *                object and the rememberMe variable to erase all of the user's settings and
-   *                preferences from the client.
-   *
-   * @returns       {undefined}
-   *
-   */
-  exports.logout = function logout () {
-    exports.user = null;
-    exports.unchangedUser = '';
-    exports.rememberMe = false;
-    document.cookie = AUTH_COOKIE_NAME + '=; expires=' + new Date( 2000 ).toUTCString();
-  };
 
   /**
    *
@@ -121,7 +74,7 @@ Q.longStackSupport = true;
    *
    */
   exports.isUserLoggedIn = function isLoggedIn () {
-    return ( exports.isAuthenticated() && Bridge.user );
+    return ( exports.isAuthenticated && exports.user );
   };
 
   /**
@@ -138,8 +91,32 @@ Q.longStackSupport = true;
    *                   has been set.
    *
    */
-  exports.isUserModified = function isUserModified() {
+  exports.isUserModified = function isUserModified () {
     return JSON.stringify( exports.user ) === exports.unchangedUser;
+  };
+
+  /**
+   *
+   * @public
+   *
+   * @function      resetSession
+   *
+   * @description   Clears the isAuthenticated flag, the "remember me" flag, the user profile object
+   *                and the unchangedUser string, such that the session information is completely
+   *                forgotten by the Bridge client and it believes that it is not authenticated and
+   *                has no user info. The browser will still hold the authentication cookie in its
+   *                cookie store, however, so the app is still authenticated if this is called
+   *                without making a deauthenticate() call first (typically this is called by
+   *                deauthenticate() to clear the session after clearing the auth cookie).
+   *
+   * @return {undefined}
+   *
+   */
+  exports.resetSession = function resetSession () {
+    exports.isAuthenticated = false;
+    exports.rememberMe = false;
+    exports.user = null;
+    exports.unchangedUser = '';
   };
 
   /**
@@ -155,7 +132,7 @@ Q.longStackSupport = true;
    * @return {String}       The same as the input, but having no trailing forward-slash.
    *
    */
-  exports.stripTrailingSlash = function stripTrailingSlash( str ) {
+  exports.stripTrailingSlash = function stripTrailingSlash ( str ) {
     // Note: String.substr() behaves differently from String.substring() here! Don't change this!
     return ( str.substr( -1 ) === '/' ) ? str.substr( 0, str.length - 1 ) : str;
   };
@@ -187,7 +164,7 @@ Q.longStackSupport = true;
    * @return {undefined}
    *
    */
-  exports.onRequestCalled = function onRequestCalled( method, url, data ) {
+  exports.onRequestCalled = function onRequestCalled ( method, url, data ) {
     // Do nothing until overridden by an implementor
   };
 
@@ -208,7 +185,7 @@ Q.longStackSupport = true;
    * @return {undefined}
    *
    */
-  exports.resolve = function resolve( name, deferred, data ) {
+  exports.resolve = function resolve ( name, deferred, data ) {
     if ( exports.debug === true ) {
       console.log( "BRIDGE | " + name + " | " + JSON.stringify( data ) );
     }
@@ -232,7 +209,7 @@ Q.longStackSupport = true;
    * @return {undefined}
    *
    */
-  exports.reject = function reject( name, deferred, data ) {
+  exports.reject = function reject ( name, deferred, data ) {
     if ( exports.debug === true ) {
       console.error( "BRIDGE | " + name + " | " + data.status + " >> Code " + data.errorCode +
         ": " + errors.getExplanation( data.errorCode ) );
@@ -262,7 +239,7 @@ Q.longStackSupport = true;
    * @returns       {Promise}           A q.js promise object.
    *
    */
-  exports.request = function request( method, url, data ) {
+  exports.request = function request ( method, url, data ) {
 
     // Call the onRequestCalled callback, if one is registered.
     if ( exports.onRequestCalled ) {
