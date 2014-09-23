@@ -53,7 +53,7 @@ module.exports = function recoverPassword( apiUrl, password, hash ) {
       }
 
       // If the request was successful, resolve the request with the response data.
-      core.reject( "Recover Password", deferred, data );
+      core.resolve( "Recover Password", deferred, data );
 
     },
     ///////////////////////////////////////////////////////////////////////////////////////////////
