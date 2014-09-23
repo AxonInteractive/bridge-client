@@ -92,7 +92,7 @@ var EXPLANATIONS = {
  */
 exports.getExplanation = function getExplanation( errorCode ) {
   'use strict';
-  return exports.EXPLANATIONS[ errorCode ] ||
+  return EXPLANATIONS[ errorCode ] ||
     "Unknown error. You may need to update your Bridge Client and/or Bridge Server version.";
 };
 
