@@ -50,13 +50,6 @@ module.exports = function login( apiUrl, email, password, rememberMe ) {
       getUserProfile( apiUrl, email ).then(
         function ( data ) {
 
-          // Validate the structure of the response, and if invalid, reject the request with a
-          // new error object indicating that the response is malformed.
-          if ( !data.content || typeof( data.content.message ) !== 'string' ) {
-            core.reject( "Login", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
-            return;
-          }
-
           // If fetching the user profile is successful, resolve the request with the response data.
           core.resolve( "Login", deferred, data );
 
