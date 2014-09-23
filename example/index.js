@@ -89,7 +89,7 @@ window.onload = function () {
     // Read in the input fields
     var email = $( '#login-email' ).val();
     var password = $( '#login-password' ).val();
-    var rememberMe = $( '#login-use-local-storage' ).prop( 'checked' );
+    var rememberMe = $( '#login-remember-me' ).prop( 'checked' );
 
     // Login by authenticating, then getting the user's profile (login() does both itself).
     Bridge.login( apiUrl, email, password, rememberMe )
