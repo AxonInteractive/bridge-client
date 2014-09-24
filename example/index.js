@@ -38,7 +38,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.register() error!</strong>  ' +
-          JSON.stringify( Bridge.errors.getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
         $( '#notify' ).prepend( timestamp( 'Register request failed...' ) );
       } );
 
@@ -57,7 +57,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.verifyEmail() error!</strong>  ' +
-          JSON.stringify( Bridge.errors.getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
         $( '#notify' ).prepend( timestamp( 'Verify Email request failed...' ) );
       } );
 
@@ -78,7 +78,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.authenticate() error!</strong>  ' +
-          JSON.stringify( Bridge.errors.getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
         $( '#notify' ).prepend( timestamp( 'Authenticate request failed...' ) );
       } );
 
@@ -101,7 +101,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.login() error!</strong>  ' +
-          JSON.stringify( Bridge.errors.getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
         $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
       } );
 
@@ -124,7 +124,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.updateUserProfile() error!</strong>  ' +
-          JSON.stringify( Bridge.errors.getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
         $( '#notify' ).prepend( timestamp( 'User Profile Update request failed...' ) );
       } );
 
@@ -143,7 +143,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.forgotPassword() error!</strong>  ' +
-          JSON.stringify( Bridge.errors.getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
         $( '#notify' ).prepend( timestamp( 'Forgot Password request failed...' ) );
       } );
 
@@ -162,7 +162,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.forgotPassword() error!</strong>  ' +
-          JSON.stringify( Bridge.errors.getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
         $( '#notify' ).prepend( timestamp( '<strong>Recover Password failed...</strong>' ) );
       } );
 
@@ -179,7 +179,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.getUserProfile() error!</strong>  ' +
-          JSON.stringify( Bridge.errors.getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
         $( '#notify' ).prepend( timestamp( '<strong>User Profile Fetch failed...</strong>' ) );
       } );
 
@@ -198,7 +198,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.logout() error!</strong>  ' +
-          JSON.stringify( Bridge.errors.getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
         $( '#notify' ).prepend( timestamp( '<strong>Logout failed...</strong>' ) );
       } );
   } );
