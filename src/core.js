@@ -204,17 +204,17 @@ Q.longStackSupport = true;
    *
    * @param  {Deferred} deferred  The Q deferred object to resolve.
    *
-   * @param  {Object} data        The object to return with the rejection.
+   * @param  {Object} error       The object to return with the rejection.
    *
    * @return {undefined}
    *
    */
-  exports.reject = function reject ( name, deferred, data ) {
+  exports.reject = function reject ( name, deferred, error ) {
     if ( exports.debug === true ) {
-      console.error( "BRIDGE | " + name + " | " + data.status + " >> Code " + data.errorCode +
-        ": " + errors.getExplanation( data.errorCode ) );
+      console.error( "BRIDGE | " + name + " | " + error.status + " >> Code " + error.errorCode +
+        ": " + errors.getExplanation( error.errorCode ) );
     }
-    deferred.reject( data );
+    deferred.reject( error );
   };
 
   /**
