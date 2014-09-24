@@ -144,10 +144,10 @@
                             return core.isAuthenticated;
                           },
     getIsUserLoggedIn   : function () {
-                            return core.isUserLoggedIn;
+                            return core.isUserLoggedIn();
                           },
     getIsUserModified   : function () {
-                            return core.isUserModified;
+                            return core.isUserModified();
                           },
     getRememberMe       : function () {
                             return core.rememberMe;
