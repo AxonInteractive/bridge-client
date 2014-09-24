@@ -168,7 +168,7 @@ window.onload = function () {
 
   } );
 
-  $( 'load-user' ).click( function ( event ) {
+  $( '#load-user' ).click( function ( event ) {
 
     // Send a recover password request using Bridge.
     Bridge.loadUser( apiUrl )
