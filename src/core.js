@@ -74,7 +74,8 @@ Q.longStackSupport = true;
    *
    */
   exports.isUserLoggedIn = function isLoggedIn () {
-    return ( exports.isAuthenticated && exports.user );
+    // Note: Using ternary here because a raw AND returns Object, since that's truthy enough.
+    return ( exports.isAuthenticated && exports.user ) ? true : false;
   };
 
   /**
