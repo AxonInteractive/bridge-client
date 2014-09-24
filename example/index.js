@@ -183,6 +183,23 @@ window.onload = function () {
 
   } );
 
+  $( '#resume' ).click( function ( event ) {
+
+    Bridge.logout( apiUrl )
+      .then( function ( data ) {
+        $( '#notify' ).prepend( timestamp( '<strong>Resume successful!</strong>' ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.getUser() result: ' + JSON.stringify( Bridge.getUser() ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.getIsUserLoggedIn() result: ' + Bridge.getIsUserLoggedIn() ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.getIsUserModified() result: ' + Bridge.getIsUserModified() ) );
+
+      } )
+      .fail( function ( error ) {
+        $( '#notify' ).prepend( timestamp( '<strong>Bridge.resume() error!</strong>  ' +
+          JSON.stringify( error.message ) ) );
+        $( '#notify' ).prepend( timestamp( '<strong>Resume failed...</strong>' ) );
+      } );
+  } );
+
   $( '#is-authenticated' ).click( function ( event ) {
 
     Bridge.isAuthenticated( apiUrl )
