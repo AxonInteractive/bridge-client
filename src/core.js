@@ -42,7 +42,7 @@ Q.longStackSupport = true;
    * @property {String}  unchangedUser  The JSON.stringify()ed user profile object as it was when it
    *                                    was set by a call to getUserProfile().
    */
-  exports.unchangedUser = '';
+  exports.unchangedUser = 'null';
 
   /**
    * @public
@@ -108,7 +108,7 @@ Q.longStackSupport = true;
   exports.resetSession = function resetSession () {
     exports.rememberMe = false;
     exports.user = null;
-    exports.unchangedUser = '';
+    exports.unchangedUser = 'null';
   };
 
   /**
