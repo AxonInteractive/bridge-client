@@ -46,7 +46,13 @@ module.exports = function sendRequest( deferred, method, url, data ) {
         // Attempt to parse the response as JSON.
         var data = JSON.parse( xhr.responseText );
 
-        // If an error status is reported, reject the request with the response's' error object.
+        // If the content property is missing from the response, the response is malformed. Reject
+        // the request with a new error object indicating that the response is malformed.
+        if ( !data.content ) {
+          deferred.reject( new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
+        }
+
+        // If an error status is reported, reject the request with the response's error object.
         if ( xhr.status >= 400 ) {
           deferred.reject( data.content );
         }
