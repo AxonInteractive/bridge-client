@@ -45,7 +45,7 @@ module.exports = function authenticate( apiUrl, email, password, rememberMe ) {
   // Build the request payload (hash the password with SHA256).
   var payload = {
     email: email,
-    password: CryptoSha256( password ).toString( CryptoEncHex ),
+    password: CryptoSha256( password.toString() ).toString( CryptoEncHex ),
     rememberMe: rememberMe
   };
 

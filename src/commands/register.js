@@ -44,11 +44,11 @@ module.exports = function register( apiUrl, email, password, firstName, lastName
 
   // Build the request payload (hash the password with SHA256).
   var payload = {
-    "appData": appData,
-    "email": email,
-    "firstName": firstName,
-    "lastName": lastName,
-    "password": CryptoSha256( password ).toString( CryptoEncHex ),
+    appData: appData,
+    email: email,
+    firstName: firstName,
+    lastName: lastName,
+    password: CryptoSha256( password.toString() ).toString( CryptoEncHex ),
   };
 
   // Send the request and handle the response.

@@ -35,7 +35,7 @@ module.exports = function recoverPassword( apiUrl, password, hash ) {
   // Build the request payload (hash the password with SHA256).
   var payload = {
     hash: hash,
-    password: CryptoSha256( password ).toString( CryptoEncHex )
+    password: CryptoSha256( password.toString() ).toString( CryptoEncHex )
   };
 
   // Send the request and handle the response.

@@ -2,8 +2,6 @@
  * @module  getUserProfile
  */
 /* global exports: true */
-var CryptoEncHex = require( '../include/crypto-js/enc-hex' );
-var CryptoSha256 = require( '../include/crypto-js/sha256' );
 var Q = require( '../include/q' );
 var core = require( '../core' );
 var errors = require( '../errors' );

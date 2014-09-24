@@ -49,10 +49,10 @@ module.exports = function saveUser( apiUrl, currentPassword, newPassword ) {
   // additional properties if the user intend to change their password.
   var payload = core.user;
   if ( currentPassword ) {
-    payload.currentPassword = CryptoSha256( currentPassword ).toString( CryptoEncHex );
+    payload.currentPassword = CryptoSha256( currentPassword.toString() ).toString( CryptoEncHex );
   }
   if ( newPassword ) {
-    payload.password = CryptoSha256( newPassword ).toString( CryptoEncHex );
+    payload.password = CryptoSha256( newPassword.toString() ).toString( CryptoEncHex );
   }
 
   // Send the request and handle the response.
