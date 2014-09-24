@@ -41,15 +41,15 @@ module.exports = function loadUser( apiUrl ) {
 
       // Validate the structure of the response, and if invalid, reject the request with a
       // new error object indicating that the response is malformed.
-      if ( !( data.content instanceof Object ) ) {
+      if ( !( data instanceof Object ) ) {
         core.reject( "Load User", deferred, new errors.BridgeError( errors.MALFORMED_RESPONSE ) );
         return;
       }
 
       // Assign the user profile as the user object.
       // Note: JSON stringify()ing the user profile keeps a static copy we can compare against.
-      core.user = data.content;
-      core.unchangedUser = JSON.stringify( data.content );
+      core.user = data;
+      core.unchangedUser = JSON.stringify( data );
 
       // If the response format is valid, resolve the request with the response data object.
       core.resolve( "Load User", deferred, data );

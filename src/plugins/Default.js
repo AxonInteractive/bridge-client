@@ -52,7 +52,7 @@ module.exports = function sendRequest( deferred, method, url, data ) {
         }
 
         // Otherwise, resolve the request with the response object.
-        deferred.resolve( data );
+        deferred.resolve( data.content );
 
       }
       catch ( e ) {
