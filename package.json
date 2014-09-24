@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://bitbucket.org/axoninteractive/bridge-client.git"
+    "url": "https://bitbucket.org/axoninteractive/bridge-client.git"
   },
   "license": "MIT",
   "main": [
