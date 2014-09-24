@@ -1,13 +1,35 @@
 {
-  "name": "bridge-client",
-  "description": "The client-side application of Axon Bridge, a simple uniform interface for providing API services to browser-based applications.",
+  "name": "axon-bridge-client",
   "version": "0.2.3",
+  "description": "The client-side application of Axon Bridge, a simple uniform interface for providing API services to browser-based applications.",
+  "homepage": "https://bitbucket.org/axoninteractive/bridge-client/wiki/Home",
+  "authors": [
+    {
+      "name": "Axon Interactive Inc.",
+      "email": "theteam@axoninteractive.ca"
+    },
+    {
+      "name": "Jeff Rose",
+      "email": "jrose0@gmail.com"
+    },
+    {
+      "name": "James Zinger",
+      "email": "Joey.Zinger.99@gmail.com"
+    }
+  ],
+  "keywords": [
+
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/axoninteractive/bridge-client"
+  },
+  "license": "MIT",
   "main": [
     "./lib/BridgeClient.js"
   ],
-  "license": [
-    "LICENSE.md"
-  ],
+  "dependencies": {},
+  "devDependencies": {},
   "ignore": [
     "node_modules",
     "src",
@@ -16,19 +38,5 @@
     "bridge-client.sublime-project",
     "gulpfile.js",
     "package.json"
-  ],
-  "keywords": [
-
-  ],
-  "authors": [
-    "Jeff Rose", "Jeff Rose <jrose0@gmail.com>",
-    "James Zinger", "James Zinger <Joey.Zinger.99@gmail.com>"
-  ],
-  "homepage": "https://bitbucket.org/axoninteractive/bridge-client/wiki/Home",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@bitbucket.org/axoninteractive/bridge-client"
-  },
-  "dependencies": {},
-  "devDependencies": {}
+  ]
 }
