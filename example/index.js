@@ -8,7 +8,7 @@ window.onload = function () {
   // Setup ////////////////////////////////////////////////////////////////////////////////////////
   // Specify the debug mode and your API's base URL (for your own convenience)
   Bridge.setDebug( true );
-  var apiUrl = 'https://localhost:3000/api/1.0';
+  var apiUrl = 'https://localhost:3000/api';
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Just a convenience to dump text to the DOM for this demo:
@@ -74,7 +74,6 @@ window.onload = function () {
     Bridge.authenticate( apiUrl, email, password, rememberMe )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>Authentication successful!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.getIsAuthenticated() result: ' + Bridge.getIsAuthenticated() ) );
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.authenticate() error!</strong>  ' +
@@ -95,9 +94,6 @@ window.onload = function () {
     Bridge.login( apiUrl, email, password, rememberMe )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>Login successful!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.getIsAuthenticated() result: ' + Bridge.getIsAuthenticated() ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.getIsUserLoggedIn() result: ' + Bridge.getIsUserLoggedIn() ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.getIsUserModified() result: ' + Bridge.getIsUserModified() ) );
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.login() error!</strong>  ' +
@@ -174,7 +170,9 @@ window.onload = function () {
     Bridge.loadUser( apiUrl )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>User Profile Fetch successful!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.getUser() ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.getUser() result: ' + JSON.stringify( Bridge.getUser() ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.getIsUserLoggedIn() result: ' + Bridge.getIsUserLoggedIn() ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.getIsUserModified() result: ' + Bridge.getIsUserModified() ) );
 
       } )
       .fail( function ( error ) {
@@ -208,8 +206,7 @@ window.onload = function () {
     Bridge.logout( apiUrl )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>Logout successful!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.getUser(): ' + JSON.stringify( Bridge.getUser() ) ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.getIsAuthenticated() result: ' + Bridge.getIsAuthenticated() ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.getUser() result: ' + JSON.stringify( Bridge.getUser() ) ) );
         $( '#notify' ).prepend( timestamp( 'Bridge.getIsUserLoggedIn() result: ' + Bridge.getIsUserLoggedIn() ) );
         $( '#notify' ).prepend( timestamp( 'Bridge.getIsUserModified() result: ' + Bridge.getIsUserModified() ) );
 
