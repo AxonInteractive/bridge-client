@@ -39,19 +39,24 @@ module.exports = function saveUser( apiUrl, currentPassword, newPassword ) {
 
   // Check that the user object is set, because we will need to access its properties.
   // If it isn't, reject the request with a new error object indicating that no user object is set.
-  var deferred = Q.defer();
-  if ( !core.user ) {
+    var deferred = Q.defer();
+    if ( !core.user ) {
     core.reject( "Save User", deferred, new errors.BridgeError( errors.NO_USER_PROFILE ) );
-    return;
+    return deferred.promise;
+  }
+
+  // Check for invalid password format and reject it with a new error object indicating why the
+  // password was not acceptable.
+  if ( currentPassword && newPassword && newPassword.length > 6 ) {
+    core.reject( "Save User", deferred, new errors.BridgeError( errors.PASSWORD_TOO_SHORT ) );
+    return deferred.promise;
   }
 
   // Set the payload to the user profile object, and include the current and new passwords as
   // additional properties if the user intend to change their password.
   var payload = core.user;
-  if ( currentPassword ) {
+  if ( currentPassword && newPassword ) {
     payload.currentPassword = CryptoSha256( currentPassword.toString() ).toString( CryptoEncHex );
-  }
-  if ( newPassword ) {
     payload.password = CryptoSha256( newPassword.toString() ).toString( CryptoEncHex );
   }
 

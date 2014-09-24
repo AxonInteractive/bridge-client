@@ -42,6 +42,14 @@ module.exports = function register( apiUrl, email, password, firstName, lastName
 
   'use strict';
 
+  // Check for invalid password format and reject it with a new error object indicating why the
+  // password was not acceptable.
+  var deferred = Q.defer();
+  if ( password.length > 6 ) {
+    core.reject( "Register", deferred, new errors.BridgeError( errors.PASSWORD_TOO_SHORT ) );
+    return deferred.promise;
+  }
+
   // Build the request payload (hash the password with SHA256).
   var payload = {
     appData: appData,
@@ -52,7 +60,6 @@ module.exports = function register( apiUrl, email, password, firstName, lastName
   };
 
   // Send the request and handle the response.
-  var deferred = Q.defer();
   core.request( 'POST', core.stripTrailingSlash( apiUrl ) + '/user', payload ).then(
 
     // Request was resolved ///////////////////////////////////////////////////////////////////////
