@@ -93,7 +93,7 @@ Q.longStackSupport = true;
    *
    */
   exports.isUserModified = function isUserModified () {
-    return JSON.stringify( exports.user ) === exports.unchangedUser;
+    return JSON.stringify( exports.user ) !== exports.unchangedUser;
   };
 
   /**
