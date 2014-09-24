@@ -264,6 +264,9 @@ Q.longStackSupport = true;
       // Request was rejected /////////////////////////////////////////////////////////////////////
       function ( error ) {
 
+        // If a debug message was sent, set it as the message. If not, the error message is empty.
+        error.message = error.debugMessage || '';
+
         // If the response failed, reject the request with the error object passed up from below.
         exports.reject( "Request", deferred, error );
 

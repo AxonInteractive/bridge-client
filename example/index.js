@@ -78,7 +78,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.authenticate() error!</strong>  ' +
-          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( error.message ) ) );
         $( '#notify' ).prepend( timestamp( 'Authenticate request failed...' ) );
       } );
 
