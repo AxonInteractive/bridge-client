@@ -20,18 +20,30 @@ var errors = require( '../errors' );
  *                                      matter whether the trailing forward-slash is left on or not
  *                                      because either case is handled appropriately.
  *
+ * @param         {Boolean} overwrite   A flag indicating that, in the event that this loadUser()
+ *                                      call will overwrite unsaved changes on the client, the
+ *                                      operation will be carried out rather than rejecting with an
+ *                                      error to warn of the overwrite.
+ *
  * @returns       {Promise}             A q.js promise object.
  *
  */
-module.exports = function loadUser( apiUrl ) {
+module.exports = function loadUser( apiUrl, overwrite ) {
 
   'use strict';
+
+  // Check for unsaved changes that might be overwritten and reject with a new error indicating that
+  // these changes will be lost (unless the overwrite flag is set).
+  var deferred = Q.defer();
+  if ( !overwrite && core.isUserModified() ) {
+    core.reject( "Load User", deferred, new errors.BridgeError( errors.WILL_LOSE_UNSAVED_CHANGES ) );
+    return deferred.promise;
+  }
 
   // Build and empty request payload (don't need to send anything).
   var payload = {};
 
   // Send the request and handle the response.
-  var deferred = Q.defer();
   core.request( 'GET', core.stripTrailingSlash( apiUrl ) + '/user', payload ).then(
 
     // Request was resolved /////////////////////////////////////////////////////////////////////

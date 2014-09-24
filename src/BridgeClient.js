@@ -16,6 +16,7 @@
   var logout            = require( './commands/logout' );
   var recoverPassword   = require( './commands/recoverPassword' );
   var register          = require( './commands/register' );
+  var resume            = require( './commands/resume' );
   var saveUser          = require( './commands/saveUser' );
   var verifyEmail       = require( './commands/verifyEmail' );
 
@@ -110,6 +111,13 @@
    *                                          success and failure of your request, whatever it may
    *                                          be.
    *
+   * @property {Function} resume              Makes an API call to check if the session is
+   *                                          authenticated, and if it is, then the user profile is
+   *                                          loaded to resume the session. If the user profile
+   *                                          object has been modified, this request will reject
+   *                                          with an error to preserve any changes (since changes
+   *                                          mean the session is already started).
+   *
    * @property {Function} saveUser            Makes an API call to submit the current user object to
    *                                          the database as the up-to-date copy. If successful,
    *                                          the user's profile in the database will be updated.
@@ -170,6 +178,7 @@
     logout              : logout,
     recoverPassword     : recoverPassword,
     register            : register,
+    resume              : resume,
     saveUser            : saveUser,
     verifyEmail         : verifyEmail,
 

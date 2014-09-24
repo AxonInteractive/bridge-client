@@ -54,6 +54,24 @@ exports.REQUEST_TIMEOUT = 103;
 exports.NO_USER_PROFILE = 104;
 
 /**
+ * @public
+ * @constant      PASSWORD_TOO_SHORT
+ * @description   An error code indicating that the requested password is not long enough, and that
+ *                the user must select a longer password to ensure account security.
+ * @type          {Number}
+ */
+exports.PASSWORD_TOO_SHORT = 105;
+
+/**
+ * @public
+ * @constant      WILL_LOSE_UNSAVED_CHANGES
+ * @description   An error code indicating that the requested operation may overwrite user data that
+ *                is not yet saved on the client.
+ * @type          {Number}
+ */
+exports.WILL_LOSE_UNSAVED_CHANGES = 106;
+
+/**
  * @private
  * @enum EXPLANATIONS
  * @description   A map of error codes (keys) to error code explanations (values).
@@ -90,7 +108,8 @@ var EXPLANATIONS = {
   102: "The response failed or was incomplete due to a network error.",
   103: "The server did not respond. Check your internet connection and confirm that your Bridge Server is running.",
   104: "No user profile is currently loaded. You must login before you can continue.",
-  105: "The supplied password is too short. Please choose a longer, more secure password."
+  105: "The supplied password is too short. Please choose a longer, more secure password.",
+  106: "The requested operation will result in unsaved changes being lost. Are you sure?"
 };
 
 /**
