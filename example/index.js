@@ -74,7 +74,7 @@ window.onload = function () {
     Bridge.authenticate( apiUrl, email, password, rememberMe )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>Authentication successful!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.isAuthenticated() result: ' + Bridge.isAuthenticated() ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isAuthenticated() result: ' + Bridge.getIsAuthenticated() ) );
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.authenticate() error!</strong>  ' +
@@ -95,9 +95,9 @@ window.onload = function () {
     Bridge.login( apiUrl, email, password, rememberMe )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>Login successful!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.isAuthenticated() result: ' + Bridge.isAuthenticated() ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.isUserLoggedIn() result: ' + Bridge.isUserLoggedIn() ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.isUserModified() result: ' + Bridge.isUserModified() ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isAuthenticated() result: ' + Bridge.getIsAuthenticated() ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isUserLoggedIn() result: ' + Bridge.getIsUserLoggedIn() ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isUserModified() result: ' + Bridge.getIsUserModified() ) );
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.login() error!</strong>  ' +
@@ -174,7 +174,7 @@ window.onload = function () {
     Bridge.loadUser( apiUrl )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>User Profile Fetch successful!</strong>' ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.user ) ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.user: ' + JSON.stringify( Bridge.getUser() ) ) );
 
       } )
       .fail( function ( error ) {
@@ -191,9 +191,9 @@ window.onload = function () {
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>Logout successful!</strong>' ) );
         $( '#notify' ).prepend( timestamp( 'Bridge.getUser(): ' + JSON.stringify( Bridge.getUser() ) ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.isAuthenticated() result: ' + Bridge.isAuthenticated() ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.isUserLoggedIn() result: ' + Bridge.isUserLoggedIn() ) );
-        $( '#notify' ).prepend( timestamp( 'Bridge.isUserModified() result: ' + Bridge.isUserModified() ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isAuthenticated() result: ' + Bridge.getIsAuthenticated() ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isUserLoggedIn() result: ' + Bridge.getIsUserLoggedIn() ) );
+        $( '#notify' ).prepend( timestamp( 'Bridge.isUserModified() result: ' + Bridge.getIsUserModified() ) );
 
       } )
       .fail( function ( error ) {
