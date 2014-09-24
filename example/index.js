@@ -185,7 +185,7 @@ window.onload = function () {
 
   $( '#resume' ).click( function ( event ) {
 
-    Bridge.logout( apiUrl )
+    Bridge.resume( apiUrl )
       .then( function ( data ) {
         $( '#notify' ).prepend( timestamp( '<strong>Resume successful!</strong>' ) );
         $( '#notify' ).prepend( timestamp( 'Bridge.getUser() result: ' + JSON.stringify( Bridge.getUser() ) ) );
