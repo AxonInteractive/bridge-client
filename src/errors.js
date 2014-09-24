@@ -89,7 +89,8 @@ var EXPLANATIONS = {
   101: "The response from the server was badly formed. Ensure that your Bridge Client and Bridge Server versions match.",
   102: "The response failed or was incomplete due to a network error.",
   103: "The server did not respond. Check your internet connection and confirm that your Bridge Server is running.",
-  104: "No user profile is currently loaded. You must login before you can continue."
+  104: "No user profile is currently loaded. You must login before you can continue.",
+  105: "The supplied password is too short. Please choose a longer, more secure password."
 };
 
 /**

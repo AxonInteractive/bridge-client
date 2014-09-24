@@ -8,7 +8,7 @@ window.onload = function () {
   // Setup ////////////////////////////////////////////////////////////////////////////////////////
   // Specify the debug mode and your API's base URL (for your own convenience)
   Bridge.setDebug( true );
-  var apiUrl = 'https://192.168.2.34/peir/api/1.0';
+  var apiUrl = 'https://localhost:3000/api/1.0';
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Just a convenience to dump text to the DOM for this demo:
@@ -38,7 +38,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.register() error!</strong>  ' +
-          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( error.message ) ) );
         $( '#notify' ).prepend( timestamp( 'Register request failed...' ) );
       } );
 
@@ -57,7 +57,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.verifyEmail() error!</strong>  ' +
-          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( error.message ) ) );
         $( '#notify' ).prepend( timestamp( 'Verify Email request failed...' ) );
       } );
 
@@ -101,7 +101,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.login() error!</strong>  ' +
-          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( error.message ) ) );
         $( '#notify' ).prepend( timestamp( 'Login request failed...' ) );
       } );
 
@@ -124,7 +124,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.updateUserProfile() error!</strong>  ' +
-          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( error.message ) ) );
         $( '#notify' ).prepend( timestamp( 'User Profile Update request failed...' ) );
       } );
 
@@ -143,7 +143,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.forgotPassword() error!</strong>  ' +
-          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( error.message ) ) );
         $( '#notify' ).prepend( timestamp( 'Forgot Password request failed...' ) );
       } );
 
@@ -162,7 +162,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.forgotPassword() error!</strong>  ' +
-          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( error.message ) ) );
         $( '#notify' ).prepend( timestamp( '<strong>Recover Password failed...</strong>' ) );
       } );
 
@@ -179,10 +179,28 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.getUserProfile() error!</strong>  ' +
-          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( error.message ) ) );
         $( '#notify' ).prepend( timestamp( '<strong>User Profile Fetch failed...</strong>' ) );
       } );
 
+  } );
+
+  $( '#is-authenticated' ).click( function ( event ) {
+
+    Bridge.isAuthenticated( apiUrl )
+      .then( function ( data ) {
+        $( '#notify' ).prepend( timestamp( '<strong>You are authenticated!</strong>' ) );
+
+      } )
+      .fail( function ( error ) {
+        if ( error.status === 403 ) {
+          $( '#notify' ).prepend( timestamp( '<strong>You are NOT authenticated!</strong>' ) );
+        }
+        else {
+          $( '#notify' ).prepend( timestamp( '<strong>Bridge.isAuthenticated() error!</strong>  ' +
+          JSON.stringify( error.message ) ) );
+        }
+      } );
   } );
 
   $( '#logout' ).click( function ( event ) {
@@ -198,7 +216,7 @@ window.onload = function () {
       } )
       .fail( function ( error ) {
         $( '#notify' ).prepend( timestamp( '<strong>Bridge.logout() error!</strong>  ' +
-          JSON.stringify( Bridge.getErrors().getExplanation( error.errorCode ) ) ) );
+          JSON.stringify( error.message ) ) );
         $( '#notify' ).prepend( timestamp( '<strong>Logout failed...</strong>' ) );
       } );
   } );

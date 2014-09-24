@@ -33,13 +33,6 @@ Q.longStackSupport = true;
 
   /**
    * @public
-   * @property {Boolean}  isAuthenticated  Whether or not the current session has been
-   *                                       authenticated by the API server.
-   */
-  exports.isAuthenticated = false;
-
-  /**
-   * @public
    * @property {Boolean}  rememberMe  Whether or not the user selected the remember me option.
    */
   exports.rememberMe = false;
@@ -67,15 +60,14 @@ Q.longStackSupport = true;
    *
    * @function      isUserLoggedIn
    *
-   * @description   Returns whether or not a user is logged in by checking first, if there is an
-   *                existing authentication cookie for the session and in the user object is set.
+   * @description   Returns whether or not the user object is set.
    *
    * @return        {Boolean} Whether or not a user object exists and is authenticated.
    *
    */
   exports.isUserLoggedIn = function isLoggedIn () {
     // Note: Using ternary here because a raw AND returns Object, since that's truthy enough.
-    return ( exports.isAuthenticated && exports.user ) ? true : false;
+    return ( exports.user ) ? true : false;
   };
 
   /**
@@ -114,7 +106,6 @@ Q.longStackSupport = true;
    *
    */
   exports.resetSession = function resetSession () {
-    exports.isAuthenticated = false;
     exports.rememberMe = false;
     exports.user = null;
     exports.unchangedUser = '';

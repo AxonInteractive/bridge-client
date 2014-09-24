@@ -10,6 +10,7 @@
   var authenticate      = require( './commands/authenticate' );
   var deauthenticate    = require( './commands/deauthenticate' );
   var forgotPassword    = require( './commands/forgotPassword' );
+  var isAuthenticated   = require( './commands/isAuthenticated' );
   var loadUser          = require( './commands/loadUser' );
   var login             = require( './commands/login' );
   var logout            = require( './commands/logout' );
@@ -33,9 +34,6 @@
    * @property {Function} getErrors           This function returns the errors module from which all
    *                                          of the error types that Bridge uses to enumerate
    *                                          failures are visible.
-   *
-   * @property {Function} getIsAuthenticated  This function returns whether or not the current
-   *                                          session has been authenticated by the API server.
    *
    * @property {Function} getIsUserLoggedIn   Checks to see if the session is authenticated and that
    *                                          the user profile object is set. Both both are true,
@@ -74,6 +72,11 @@
    * @property {Function} forgotPassword      Makes an API call to request a password recovery email
    *                                          be sent to the given email address. recoverPassword()
    *                                          represents the completion of the recovery process.
+   *
+   * @property {Function} isAuthenticated     Makes an API call to request the server notify the
+   *                                          client of its authorization status. If a valid auth
+   *                                          cookie is set in the browser, then this request will
+   *                                          succeed: the session is authenticated.
    *
    * @property {Function} loadUser            Makes an API call to fetch an up-to-date copy of the
    *                                          user's profile. If this request is successful, the
@@ -140,9 +143,6 @@
     getErrors           : function () {
                             return errors;
                           },
-    getIsAuthenticated  : function () {
-                            return core.isAuthenticated;
-                          },
     getIsUserLoggedIn   : function () {
                             return core.isUserLoggedIn();
                           },
@@ -160,15 +160,16 @@
     onRequestCalled     : core.onRequestCalled,
 
     // Commands
+    request             : core.request,
     authenticate        : authenticate,
     deauthenticate      : deauthenticate,
     forgotPassword      : forgotPassword,
+    isAuthenticated     : isAuthenticated,
     loadUser            : loadUser,
     login               : login,
     logout              : logout,
     recoverPassword     : recoverPassword,
     register            : register,
-    request             : core.request,
     saveUser            : saveUser,
     verifyEmail         : verifyEmail,
 
