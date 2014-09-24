@@ -4,6 +4,21 @@
 
 /**
  * @public
+ * @constant      CORRUPTED_AUTH_TOKEN
+ * @description   An error code indicating that the server rejected a request because the auth token
+ *                sent in the auth cookie was corrupted. This is an especially bad error case since
+ *                this state prevents the client from accessing any private routes on the API
+ *                server, including deauthenticate(). core.request() handles this error by resetting
+ *                the session, even though the auth cookie may still be set. Ideally, this is
+ *                handled by returning the user to a login screen to re-enter their credentials so
+ *                authenticate() will be called again, allowing the server to issue a fresh auth
+ *                cookie and restore the app state.
+ * @type          {Number}
+ */
+exports.CORRUPTED_TOKEN = 26;
+
+/**
+ * @public
  * @constant      ERROR_CODE_MALFORMED_RESPONSE
  * @description   An error code indicating that the response returned from the server is either the
  *                wrong data type or is formatted incorrectly.
@@ -69,6 +84,8 @@ var EXPLANATIONS = {
   22: "The requested content cannot be accessed anonymously. Please login to a valid user account.",
   23: "The request was badly formed.",
   24: "This request must be performed anonymously. Please log out and try again.",
+  25: "The request could not be authenticated, because the authentication token was either tampered with or badly formed.",
+  26: "The requested resource requires that you be logged in as a registered user.",
   101: "The response from the server was badly formed. Ensure that your Bridge Client and Bridge Server versions match.",
   102: "The response failed or was incomplete due to a network error.",
   103: "The server did not respond. Check your internet connection and confirm that your Bridge Server is running.",

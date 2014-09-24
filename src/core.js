@@ -267,6 +267,13 @@ Q.longStackSupport = true;
         // If a debug message was sent, set it as the message. If not, the error message is empty.
         error.message = error.debugMessage || '';
 
+        // If the auth token has been corrupted, the client can't perform any private API calls
+        // including deauthenticate(). Since the cookie is inaccessible to the client, the only
+        // recourse we have is to reset the session and force the user to authenticate again
+        if ( error.errorCode === errors.CORRUPTED_AUTH_TOKEN ) {
+          exports.resetSession();
+        }
+
         // If the response failed, reject the request with the error object passed up from below.
         exports.reject( "Request", deferred, error );
 
