@@ -2,13 +2,32 @@
 
   'use strict';
 
-  var gulp = require( 'gulp' );
-  var browserify = require( 'browserify' );
-  var jshint = require( 'gulp-jshint' );
-  var rename = require( 'gulp-rename' );
-  var source = require( 'vinyl-source-stream' );
-  var streamify = require( 'gulp-streamify' );
-  var uglify = require( 'gulp-uglify' );
+  var gulp       = require( 'gulp'                );
+  var browserify = require( 'browserify'          );
+  var jshint     = require( 'gulp-jshint'         );
+  var rename     = require( 'gulp-rename'         );
+  var source     = require( 'vinyl-source-stream' );
+  var streamify  = require( 'gulp-streamify'      );
+  var uglify     = require( 'gulp-uglify'         );
+
+
+  ///////////////////////
+  // Notable Commands //
+  /////////////////////
+
+  // > gulp
+  // Builds production library files and watches for changes in the source files, rebuilding each
+  // time a change is detected.
+  gulp.task( 'default', [ 'lint', 'coreDev', 'plugins', 'watch' ] );
+
+  // > gulp build
+  // Builds production library files from source.
+  gulp.task( 'build', [ 'lint', 'coreDev', 'coreDist', 'plugins' ] );
+
+
+  ///////////////////////
+  // Task Definitions //
+  /////////////////////
 
   // Run jshint to check for any glaring errors in the JS
   gulp.task( 'lint', function () {
@@ -53,11 +72,5 @@
   gulp.task( 'watch', function () {
     gulp.watch( [ './src/**/*.js', './example/**/*' ], [ 'lint', 'coreDev', 'plugins' ] );
   } );
-
-  // Default task
-  gulp.task( 'default', [ 'lint', 'coreDev', 'plugins', 'watch' ] );
-
-  // Build task
-  gulp.task( 'build', [ 'lint', 'coreDev', 'coreDist', 'plugins' ] );
 
 } )();
