@@ -1,6 +1,6 @@
 {
   "name": "axon-bridge-client",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "The client-side application of Axon Bridge, a simple uniform interface for providing API services to browser-based applications.",
   "homepage": "https://bitbucket.org/axoninteractive/bridge-client/wiki/Home",
   "authors": [
@@ -32,6 +32,11 @@
   "devDependencies": {},
   "ignore": [
     "node_modules",
-    "bridge-client.sublime-project"
+    "src",
+    ".gitignore",
+    ".jshintrc",
+    "bridge-client.sublime-project",
+    "bridge-client.sublime-workspace",
+    "gulpfile.js"
   ]
 }
