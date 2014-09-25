@@ -32,11 +32,6 @@
   "devDependencies": {},
   "ignore": [
     "node_modules",
-    "src",
-    ".gitignore",
-    ".jshintrc",
-    "bridge-client.sublime-project",
-    "gulpfile.js",
-    "package.json"
+    "bridge-client.sublime-project"
   ]
 }
