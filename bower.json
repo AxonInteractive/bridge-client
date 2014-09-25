@@ -37,6 +37,7 @@
     ".jshintrc",
     "bridge-client.sublime-project",
     "bridge-client.sublime-workspace",
-    "gulpfile.js"
+    "gulpfile.js",
+    "package.json"
   ]
 }

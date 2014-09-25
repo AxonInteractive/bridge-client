@@ -38,8 +38,5 @@
     "vinyl-source-stream": "latest",
     "gulp-rename": "latest",
     "gulp-streamify": "latest"
-  },
-  "scripts": {
-    "update": "git reset --hard && git pull"
   }
 }
