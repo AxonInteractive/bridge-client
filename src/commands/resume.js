@@ -12,7 +12,7 @@ var loadUser = require( '../commands/loadUser' );
  *
  * @public
  *
- * @function      login [isAuthenticated >> loadUser]
+ * @function      resume [isAuthenticated >> loadUser]
  *
  * @description   Check if the current user is authenticated, and if they are, then check if the
  *                user profile object has been modified. If it hasn't been, load the user profile
@@ -59,7 +59,7 @@ module.exports = function resume( apiUrl ) {
     function ( error ) {
 
       // If authentication failed, reject the request with the error object passed up from below.
-      core.reject( "Login", deferred, error );
+      core.reject( "Resume", deferred, error );
 
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
