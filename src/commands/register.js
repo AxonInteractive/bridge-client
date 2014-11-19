@@ -45,7 +45,12 @@ module.exports = function register( apiUrl, email, password, firstName, lastName
   // Check for invalid password format and reject it with a new error object indicating why the
   // password was not acceptable.
   var deferred = Q.defer();
-  if ( password.length > 6 ) {
+
+  if ( typeof password !== 'string' ) {
+    core.reject( "Register", deferred, new errors.BridgeError( 0 ) );
+  }
+
+  if ( password.length < 1 ) {
     core.reject( "Register", deferred, new errors.BridgeError( errors.PASSWORD_TOO_SHORT ) );
     return deferred.promise;
   }
