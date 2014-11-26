@@ -104,6 +104,7 @@ var EXPLANATIONS = {
   24: "This request must be performed anonymously. Please log out and try again.",
   25: "The request could not be authenticated, because the authentication token was either tampered with or badly formed.",
   26: "The requested resource requires that you be logged in as a registered user.",
+  27: "The registration code was invalid. Please enter a valid registration code.",
   101: "The response from the server was badly formed. Ensure that your Bridge Client and Bridge Server versions match.",
   102: "The response failed or was incomplete due to a network error.",
   103: "The server did not respond. Check your internet connection and confirm that your Bridge Server is running.",
