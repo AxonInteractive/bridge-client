@@ -1,6 +1,6 @@
 {
   "name": "bridge-client",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "The client-side application of Axon Bridge, a simple uniform interface for providing API services to browser-based applications.",
   "homepage": "https://bitbucket.org/axoninteractive/bridge-client/wiki/Home",
   "authors": [
@@ -17,9 +17,7 @@
       "email": "Joey.Zinger.99@gmail.com"
     }
   ],
-  "keywords": [
-
-  ],
+  "keywords": [],
   "repository": {
     "type": "git",
     "url": "https://bitbucket.org/axoninteractive/bridge-client.git"
