@@ -47,7 +47,7 @@ module.exports = function saveUser( apiUrl, currentPassword, newPassword ) {
 
   // Check for invalid password format and reject it with a new error object indicating why the
   // password was not acceptable.
-  if ( currentPassword && newPassword && newPassword.length > 1 ) {
+  if ( currentPassword && newPassword && newPassword.length < 1 ) {
     core.reject( "Save User", deferred, new errors.BridgeError( errors.PASSWORD_TOO_SHORT ) );
     return deferred.promise;
   }
