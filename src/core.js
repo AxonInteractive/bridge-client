@@ -204,7 +204,7 @@ Q.longStackSupport = true;
   exports.reject = function reject ( name, deferred, error ) {
     if ( exports.debug === true ) {
       console.error( "BRIDGE | " + name + " | " + error.status + " >> Code " + error.errorCode +
-        ": " + errors.getExplanation( error.errorCode ) );
+        ": " + error.message );
     }
     deferred.reject( error );
   };
@@ -256,7 +256,7 @@ Q.longStackSupport = true;
       function ( error ) {
 
         // If a debug message was sent, set it as the message. If not, the error message is empty.
-        error.message = error.debugMessage || '';
+        error.message = errors.getExplanation( error.errorCode );
 
         // If the auth token has been corrupted, the client can't perform any private API calls
         // including deauthenticate(). Since the cookie is inaccessible to the client, the only
