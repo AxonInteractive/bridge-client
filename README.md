@@ -6,7 +6,7 @@ Written by Jeff Rose and James Zinger of Axon Interactive
 
 This browser library is the client-side portion of Bridge, Axon's own API development framework for database-backed browser applications. It provides a direction function call interface to each of the default Bridge API routes as well as some convenience functions for higher-order operations that are common to client-side webapps.
 
-This version of bridge-client (v0.2.11) in intended to be compatible with v0.2.11 of bridge-server (the counterpart server-side module).
+This version of bridge-client (v0.2.12) in intended to be compatible with v0.2.12 of bridge-server (the counterpart server-side module).
 
 ## Usage
 
