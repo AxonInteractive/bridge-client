@@ -32,8 +32,7 @@
   // Run jshint to check for any glaring errors in the JS
   gulp.task( 'lint', function () {
     gulp.src( './src/*.js' )
-      .pipe( jshint() )
-      .pipe( jshint.reporter( 'jshint-stylish' ) );
+      .pipe( jshint() );
   } );
 
   // Concat scripts using Browserify to manage dependencies

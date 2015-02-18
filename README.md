@@ -1,31 +1,31 @@
-# README #
+# Bridge Client
 
-See [the wiki](https://bitbucket.org/axoninteractive/bridge-client/wiki/Home) for more information about using the Bridge Client.
+Written by Jeff Rose and James Zinger of Axon Interactive
 
-This README would normally document whatever steps are necessary to get your application up and running.
+## Description
 
-### What is this repository for? ###
+This browser library is the client-side portion of Bridge, Axon's own API development framework for database-backed browser applications. It provides a direction function call interface to each of the default Bridge API routes as well as some convenience functions for higher-order operations that are common to client-side webapps.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+## Usage
 
-### How do I get set up? ###
+This module is available from the Bower package registry. Install it with the following command:
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+```bash
+bower install axon-bridge-client
+```
 
-### Contribution guidelines ###
+Once installed, simply point your build process to 
 
-* Writing tests
-* Code review
-* Other guidelines
+`<bower_components>/axon-bridge-client/lib/axon-bridge-client.js` 
 
-### Who do I talk to? ###
+Once it is being included in your website, you will be able to access Bridge globally (as window.Bridge).
 
-* Repo owner or admin
-* Other community or team contact
+## Dependencies
+
+### CryptoJS
+
+Internal security computations are done using hash functions provided by CryptoJS.
+
+### Q
+
+In order to maintain consistency with the server-side API framework and to handle asynchrony better and more intuitively, this client-side library comes packaged with the Q.js promise library. All Bridge API call functions return promises that adhere to the Promise A+ spec.

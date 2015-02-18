@@ -1,42 +1,37 @@
 {
   "name": "axon-bridge-client",
-  "version": "0.2.6",
-  "description": "The client-side application of Axon Bridge, a simple uniform interface for providing API services to browser-based applications.",
-  "homepage": "https://bitbucket.org/axoninteractive/bridge-client/wiki/Home",
-  "author": {
-    "name": "Axon Interactive Inc.",
-    "email": "theteam@axoninteractive.ca"
-  },
+  "version": "0.2.9",
+  "description": "The browser library portion of Bridge, a simple uniform interface for providing API services to browser-based applications.",
   "contributors": [
+    {
+      "name": "Axon Interactive Inc.",
+      "email": "theteam@axoninteractive.ca"
+    },
     {
       "name": "Jeff Rose",
       "email": "jrose0@gmail.com"
     },
     {
       "name": "James Zinger",
-      "email": "Joey.Zinger.99@gmail.com"
+      "email": "dev@jameszinger.com"
     }
   ],
-  "keywords": [
-
-  ],
+  "homepage": "https://github.com/AxonInteractive/bridge-client",
+  "license": "MIT",
+  "main": "src/BridgeClient.js",
   "repository": {
     "type": "git",
-    "url": "https://bitbucket.org/axoninteractive/bridge-client.git"
+    "url": "https://github.com/AxonInteractive/bridge-client.git"
   },
-  "license": "MIT",
-  "main": [
-    "./src/BridgeClient.js"
-  ],
   "dependencies": {},
   "devDependencies": {
-    "gulp": "latest",
-    "gulp-jshint": "latest",
-    "gulp-uglify": "latest",
-    "jshint-stylish": "latest",
-    "browserify": "~4.1.10",
-    "vinyl-source-stream": "latest",
-    "gulp-rename": "latest",
-    "gulp-streamify": "latest"
-  }
+    "browserify"         : "4.1.11",
+    "gulp"               : "3.8.10",
+    "gulp-jshint"        : "1.9.0",
+    "gulp-rename"        : "1.2.0",
+    "gulp-streamify"     : "0.0.5",
+    "gulp-uglify"        : "1.1.0",
+    "vinyl-source-stream": "1.0.0"
+  }, 
+  "keywords": []
 }
