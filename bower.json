@@ -1,6 +1,6 @@
 {
   "name": "axon-bridge-client",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "The browser library portion of Bridge, a simple uniform interface for providing API services to browser-based applications.",
   "authors": [
     {
